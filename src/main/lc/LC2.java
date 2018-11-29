@@ -5,7 +5,6 @@ import java.util.ArrayList;
  * Difficulty: medium
  *
  */
-
 public class LC2 {
 
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
