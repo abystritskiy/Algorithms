@@ -1,3 +1,7 @@
+/**
+ * https://www.hackerrank.com/challenges/the-grid-search
+ * Difficulty: medium
+ */
 public class GridSearchSolution {
     public static final String YES = "YES";
     public static final String NO = "NO";

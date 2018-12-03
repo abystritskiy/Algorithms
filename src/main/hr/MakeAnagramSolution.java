@@ -1,3 +1,8 @@
+/**
+ * https://www.hackerrank.com/challenges/ctci-making-anagrams/
+ * Difficulty: easy
+ */
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +17,7 @@ public class MakeAnagramSolution {
             int countA = entry.getValue();
             int countB = bMap.getOrDefault(chr, 0);
             total += Math.abs(countA - countB);
-            aMap.remove(chr);
+            bMap.remove(chr);
         }
 
         for (Map.Entry<Character, Integer> entry : bMap.entrySet()) {
