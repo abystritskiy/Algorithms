@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="26b44418-15a0-4aef-b8e5-1a332b5fa36e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/hr/GridSearchSolution.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/hr/MakeAnagramSolution.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/status.log" beforeDir="false" afterPath="$PROJECT_DIR$/status.log" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -26,28 +25,28 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="java" value="4" />
+          <entry key="java" value="6" />
           <entry key="log" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JAVA" value="4" />
+          <entry key="JAVA" value="6" />
           <entry key="Log" value="1" />
           <entry key="PLAIN_TEXT" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="2499" />
-          <entry key="log" value="36" />
+          <entry key="java" value="3066" />
+          <entry key="log" value="53" />
           <entry key="txt" value="33" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="2499" />
-          <entry key="Log" value="33" />
+          <entry key="JAVA" value="3066" />
+          <entry key="Log" value="50" />
           <entry key="PLAIN_TEXT" value="36" />
         </counts>
       </usages-collector>
@@ -75,11 +74,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/hr/GridSearchSolution.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="443">
-              <caret line="54" column="45" selection-start-line="54" selection-start-column="45" selection-end-line="54" selection-end-column="45" />
+            <state relative-caret-position="34">
+              <caret line="2" column="41" lean-forward="true" selection-end-line="57" />
             </state>
           </provider>
         </entry>
@@ -87,8 +86,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/status.log">
           <provider selected="true" editor-type-id="LogFileEditorProvider">
-            <state relative-caret-position="85">
-              <caret line="5" column="65" selection-start-line="5" selection-start-column="65" selection-end-line="5" selection-end-column="65" />
+            <state relative-caret-position="51">
+              <caret line="3" selection-start-line="3" selection-end-line="3" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/hr/MakeAnagramSolution.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="410">
+              <caret line="33" column="41" selection-start-line="33" selection-start-column="41" selection-end-line="33" selection-end-column="41" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -111,9 +122,11 @@
         <option value="$PROJECT_DIR$/src/main/lc/LC2.java" />
         <option value="$PROJECT_DIR$/src/main/lc/LC3.java" />
         <option value="$PROJECT_DIR$/src/main/hr/bigSorting.java" />
-        <option value="$PROJECT_DIR$/status.log" />
         <option value="$PROJECT_DIR$/src/main/hr/GridSearch.java" />
         <option value="$PROJECT_DIR$/src/main/hr/GridSearchSolution.java" />
+        <option value="$PROJECT_DIR$/status.log" />
+        <option value="$PROJECT_DIR$/src/main/hr/makeAnagramSolution.java" />
+        <option value="$PROJECT_DIR$/src/main/hr/MakeAnagramSolution.java" />
       </list>
     </option>
   </component>
@@ -169,7 +182,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1543790605418" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1543817968807" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
@@ -187,7 +200,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.GridSearchSolution">
+  <component name="RunManager" selected="Application.MakeAnagramSolution">
     <configuration name="GridSearchSolution" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="GridSearchSolution" />
       <module name="main" />
@@ -209,6 +222,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="MakeAnagramSolution" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="MakeAnagramSolution" />
+      <module name="main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="bigSorting" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="bigSorting" />
       <module name="main" />
@@ -221,9 +241,11 @@
       <item itemvalue="Application.LC3" />
       <item itemvalue="Application.bigSorting" />
       <item itemvalue="Application.GridSearchSolution" />
+      <item itemvalue="Application.MakeAnagramSolution" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.MakeAnagramSolution" />
         <item itemvalue="Application.GridSearchSolution" />
         <item itemvalue="Application.bigSorting" />
         <item itemvalue="Application.LC3" />
@@ -256,14 +278,28 @@
       <option name="project" value="LOCAL" />
       <updated>1543787933983</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="https://www.hackerrank.com/challenges/the-grid-search/">
+      <created>1543790625915</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1543790625915</updated>
+    </task>
+    <task id="LOCAL-00004" summary="https://www.hackerrank.com/challenges/the-grid-search/">
+      <created>1543790686358</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1543790686358</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25718608" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25718608" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -272,7 +308,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3289689" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.33224222" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39934534" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -298,7 +334,8 @@
     <MESSAGE value="LeetCode - task#3" />
     <MESSAGE value="LeetCode practice" />
     <MESSAGE value="https://www.hackerrank.com/challenges/big-sorting" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://www.hackerrank.com/challenges/big-sorting" />
+    <MESSAGE value="https://www.hackerrank.com/challenges/the-grid-search/" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://www.hackerrank.com/challenges/the-grid-search/" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -361,15 +398,25 @@
         </state>
       </provider>
       <provider selected="true" editor-type-id="LogFileEditorProvider">
-        <state relative-caret-position="85">
-          <caret line="5" column="65" selection-start-line="5" selection-start-column="65" selection-end-line="5" selection-end-column="65" />
+        <state relative-caret-position="51">
+          <caret line="3" selection-start-line="3" selection-end-line="3" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/hr/GridSearchSolution.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="443">
-          <caret line="54" column="45" selection-start-line="54" selection-start-column="45" selection-end-line="54" selection-end-column="45" />
+        <state relative-caret-position="34">
+          <caret line="2" column="41" lean-forward="true" selection-end-line="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/hr/MakeAnagramSolution.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="410">
+          <caret line="33" column="41" selection-start-line="33" selection-start-column="41" selection-end-line="33" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
