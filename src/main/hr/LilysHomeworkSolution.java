@@ -4,6 +4,7 @@
  *
  */
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class LilysHomeworkSolution {
     static int lilysHomework(int[] arr) {
@@ -16,10 +17,6 @@ public class LilysHomeworkSolution {
         System.arraycopy(sortedAsc, 0, sortedDesc, 0, arr.length);
         reverseArray(sortedDesc);
 
-        System.out.println(Arrays.toString(arr));
-        System.out.println(Arrays.toString(sortedAsc));
-        System.out.println(Arrays.toString(sortedDesc));
-
         int swapsAsc = getSwaps(arr, sortedAsc);
         int swapsDesc = getSwaps(arr, sortedDesc);
         return Math.min(swapsAsc, swapsDesc);
@@ -28,6 +25,11 @@ public class LilysHomeworkSolution {
     private static int getSwaps(int[] arr, int[] sorted) {
         int swaps = 0;
         boolean[] visited = new boolean[arr.length];
+
+        HashMap<Integer, Integer> mapSorted = new HashMap<>();
+        for (int k=0; k<sorted.length; k++) {
+            mapSorted.put(sorted[k], k);
+        }
 
         for (int i=0; i<arr.length; i++) {
             if (visited[i] || arr[i] == sorted[i]) {
@@ -40,21 +42,12 @@ public class LilysHomeworkSolution {
             while (!visited[key]) {
                 visited[key] = true;
                 c_count++;
-                key = getExpectedPosition(sorted,  arr[key]);
+                key = mapSorted.get(arr[key]);
             }
 
             swaps += c_count - 1;
         }
         return swaps;
-    }
-
-    private static int getExpectedPosition(int[] arr, int val) {
-        for (int j=0; j<arr.length; j++) {
-            if (arr[j] == val) {
-                return j;
-            }
-        }
-        return -1;
     }
 
     private static void reverseArray(int[] arr) {
