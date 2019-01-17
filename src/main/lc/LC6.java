@@ -8,14 +8,16 @@ import java.util.ArrayList;
 
 public class LC6 {
     public String convert(String s, int numRows) {
+
+        if (numRows == 1) {
+            return s;
+        }
         ArrayList<ArrayList<Character>> rows = new ArrayList<>();
         for (int j = 0; j < numRows; j++) {
             ArrayList<Character> row = new ArrayList<>();
             rows.add(row);
         }
 
-        // 3 => 4
-        // 4 => 6
         int period = 2 * numRows - 2;
         int first = 0;
         int last = numRows-1;
@@ -24,15 +26,16 @@ public class LC6 {
             char chr = s.charAt(i);
             int rmd = i % period;
 
-            // last and first get only their remainder vals
-            // rest remainder; remainder + shift
-
             if (rmd == 0 ) {
                 rows.get(first).add(chr);
             } else if (rmd == last) {
                 rows.get(last).add(chr);
             } else {
-
+                if (rmd < numRows) {
+                    rows.get(rmd).add(chr);
+                } else {
+                    rows.get(2*(numRows-1) - rmd).add(chr);
+                }
             }
 
         }
@@ -47,23 +50,6 @@ public class LC6 {
 
         return out.toString();
     }
-    // 01234567890123
-    // PAYPALISHIRING
-    //
-    //
-
-    // 01234567890123456
-    // amazonhiringevent => aoretmzniigvnahne
-    //
-//0    P     I     N    0, 6, 12
-//1    A   L S   I G    1, 5, 7, 11, 13
-//2    Y A   H R        2 + (x0 + 2 * distanceToTheEnd)
-//3    P     I          3
-
-//
-    // 0 4 8 12 16          i%4 == 0
-    // 1 3 5 7 9 11 13 15   i%2 == 1
-    // 2 6 10 14            i%4 == 2
 
 
     public static void main(String[] args) {

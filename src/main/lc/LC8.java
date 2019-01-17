@@ -12,11 +12,13 @@ public class LC8 {
 
         int pointer = 0;
         while(pointer<str.length()) {
-            char chr = str.charAt(pointer);
-            if (chr != ' ' && (chr<48 || chr>57) && chr != '-') {
+            int chr = str.charAt(pointer) + '0';
+            if (chr != ' ' && (chr<48 || chr>57) && (chr != '-' || chr != '+')) {
                 break;
             } else  if (chr == '-' && digits.size() == 0) {
                 sign = -1;
+            }  else  if (chr == '+' && digits.size() == 0) {
+                sign = 1;
             } else if ((chr<48 || chr>57) && digits.size() != 0 ) {
                 break;
             } else if (chr>=48 && chr<=57) {
@@ -26,19 +28,23 @@ public class LC8 {
 
         }
         for (int i=digits.size()-1; i>=0; i--) {
-            int pow = digits.size()-1-i;
-            double tmp = digits.get(i) * Math.pow(10, pow);
+            double pow = Math.pow(10, digits.size()-1-i);
+            double tmp = digits.get(i) * pow;
             total += tmp;
 
+
+
+
         }
-        return sign * total;
+        total = sign*total;
+        return  total;
     }
 
     public static void main(String[] args) {
         LC8 obj = new LC8();
-        System.out.println(obj.myAtoi("0")); // 0
-        System.out.println(obj.myAtoi("    -42")); // -42
-        System.out.println(obj.myAtoi("words and 987 and going")); //987
+//        System.out.println(obj.myAtoi("-91283472332"));
+        System.out.println(obj.myAtoi("+1"));
+
 
     }
 }
