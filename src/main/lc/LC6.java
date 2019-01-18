@@ -52,7 +52,7 @@ public class LC6 {
     }
 
 
-    public static void main(String[] args) {
+    private static void main(String[] args) {
         LC6 obj = new LC6();
         System.out.println(obj.convert("PAYPALISHIRING", 3).equals("PAHNAPLSIIGYIR"));
         System.out.println(obj.convert("PAYPALISHIRING", 4).equals("PINALSIGYAHRPI"));

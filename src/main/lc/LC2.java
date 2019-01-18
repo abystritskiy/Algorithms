@@ -70,10 +70,10 @@ public class LC2 {
             l3 = l3.next;
         }
     }
+    private static class ListNode {
+        int val;
+        ListNode next;
+        ListNode(int x) { val = x; }
+    }
 }
 
-class ListNode {
-     int val;
-     ListNode next;
-     ListNode(int x) { val = x; }
-}
