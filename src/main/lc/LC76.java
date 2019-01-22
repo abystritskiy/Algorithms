@@ -12,17 +12,19 @@ public class LC76 {
         }
 
         int start = 0, end =0, len = Integer.MAX_VALUE;
-        int counter = getScore(tMap);
+        int counter = 0;
+        for (Map.Entry<Character, Integer> entry: tMap.entrySet()) {
+            counter += entry.getValue();
+        }
 
         String ans = "";
 
         while (end < s.length()) {
             char endChar = s.charAt(end);
 
-            if (tMap.containsKey(endChar)) {
+            if (tMap.containsKey(endChar) && tMap.get(endChar) > 0) {
                 int newValue = tMap.get(endChar)-1;
                 tMap.put(endChar, newValue);
-
                 counter--;
             }
             end++;
@@ -32,18 +34,10 @@ public class LC76 {
                     len = end - start;
                     ans = s.substring(start, end);
                 }
-                // begin char could be in table or not,
-                // if not then good for us, it was a wasteful char and we shortened the previously found substring.
+                char startChar = s.charAt(start);
 
-                // if found in table increment count in table, as we are leaving it out of window and moving ahead,
-                // so it would no longer be a part of the substring marked by begin-end window
-                // table only has count of chars required to make the present substring a valid candidate
-                // if the count goes above zero means that the current window is missing one char to be an answer candidate
-
-                char startchar = s.charAt(start);
-
-                if(tMap.getOrDefault(startchar, 0 ) == 1){
-                    tMap.put(startchar, tMap.get(startchar) + 1);
+                if(tMap.containsKey(startChar)){
+                    tMap.put(startChar, tMap.get(startChar) + 1);
                     counter++;
                 }
 
@@ -54,40 +48,10 @@ public class LC76 {
         return ans;
     }
 
-    public static int getScore(HashMap<Character, Integer> tMap) {
-        int score = 0;
-        for (Map.Entry<Character, Integer> entry: tMap.entrySet()) {
-            score += entry.getValue();
-        }
-        return score;
-    }
 
     public static void main(String[] args) {
-        String s = "ADOBECODEBANC";
-        String t = "ABC";
+        String s = "bba";
+        String t = "ab";
         System.out.println(minWindow(s,t));
-    }
-
-    static int shiftedArrSearch(int[] shiftArr, int num) {
-        int start = 0;
-        int end = shiftArr.length - 1;
-        //[9, 12, 17, 2, 4, 5] // 2 => out = 3;
-        // start = 2;
-        // end = 5;
-        // mid = 3; mid element = 17
-        while (start < end) {
-            int mid = (end + start) / 2;
-            int midElement = shiftArr[mid];
-
-            if (midElement == num) {
-                return mid;
-            }
-            if (num < mid && num >= shiftArr[start]) {
-                end = mid;
-            } else {
-                start = mid;
-            }
-        }
-        return -1;
     }
 }
