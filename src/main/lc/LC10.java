@@ -4,22 +4,19 @@
  */
 public class LC10 {
     public boolean isMatch(String s, String p) {
-        // mississippi
-        //i^
-
-        // mis*is*p*.
-        //j^
-
         int i = 0;
         int j = 0;
-
+        char mem = '*';
         while (true) {
             if (i == s.length() && j == p.length()) {
                 return true;
             }
 
             if (i == s.length() && j != p.length()) {
-
+                return false;
+            }
+            if (i != s.length() && j == p.length()) {
+                return false;
             }
 
             char cS = s.charAt(i);
@@ -30,13 +27,26 @@ public class LC10 {
                 j++;
                 continue;
             }
+            //  mississippi
+            //i    ^
+
+            //  mis*is*p*.
+            //j   ^
+
 
             if (cP == '*') {
-                break;
+                mem = p.charAt(j-1);
+                while (cS == mem) {
+                    i++;
+                    continue;
+                }
+                continue;
             }
         }
-        return true;
+//        return true;
     }
+
+
 
     public static void main(String[] args) {
         LC10 obj = new LC10();
