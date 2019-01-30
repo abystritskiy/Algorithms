@@ -12,14 +12,12 @@ public class LC76 {
         }
 
         int start = 0, end =0, len = Integer.MAX_VALUE;
-        int counter = 0;
-        for (Map.Entry<Character, Integer> entry: tMap.entrySet()) {
-            counter += entry.getValue();
-        }
+        int counter = getScore(tMap);
+
 
         String ans = "";
 
-        while (end < s.length()) {
+        while (end < s.length() || start<s.length()-t.length()) {
             char endChar = s.charAt(end);
 
             if (tMap.containsKey(endChar) && tMap.get(endChar) > 0) {
@@ -46,6 +44,14 @@ public class LC76 {
         }
 
         return ans;
+    }
+
+    private static int getScore(HashMap<Character, Integer> tMap) {
+        int score = 0;
+        for (Map.Entry<Character, Integer> entry: tMap.entrySet()) {
+            score += entry.getValue();
+        }
+        return score;
     }
 
 
