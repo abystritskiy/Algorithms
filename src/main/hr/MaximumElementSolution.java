@@ -3,21 +3,16 @@ import java.util.*;
 
 public class MaximumElementSolution {
 
-    public static int findMaxElement(int[][]  query) {
-        // 1 - push element to stack
-        // 2 - delete element from the top of stack
-        // 3 - print max element
-        return 10;
-    }
-
-    private static final Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) throws IOException {
-
+        Scanner scanner = new Scanner(System.in);
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
         int n = Integer.parseInt(scanner.nextLine().trim());
 
-        int[][] query = new int[n][2];
-        for (int i=0; i<n; i++) {
+        MaxNode maxNode = null;
+        Stack<Integer> stack = new Stack<>();
+
+        for (int i = 0; i < n; i++) {
             String[] line = scanner.nextLine().trim().split(" ");
             int command = Integer.parseInt(line[0]);
             int val = 0;
@@ -25,17 +20,36 @@ public class MaximumElementSolution {
                 val = Integer.parseInt(line[1]);
             }
 
-            query[i] = new int[] {command, val};
+            if (command == 1) {
+                stack.push(val);
+                if (maxNode == null || maxNode.val < val) {
+                    MaxNode newMax = new MaxNode(val);
+                    newMax.previousMax = maxNode;
+                    maxNode = newMax;
+                }
+            } else if (command == 2) {
+                int top = stack.pop();
+                if (top == maxNode.val) {
+                    MaxNode prevMax = maxNode.previousMax;
+                    maxNode = prevMax;
+                }
+            } else {
+                // System.out.println(maxNode.val);
+                bufferedWriter.write(String.valueOf(maxNode.val));
+                bufferedWriter.newLine();
+            }
         }
+        scanner.close();
+        bufferedWriter.close();
 
-        findMaxElement(query);
     }
 
-    private static class Node {
+    private static class MaxNode {
+        int val;
+        MaxNode previousMax = null;
 
+        public MaxNode(int val) {
+            this.val = val;
+        }
     }
 }
-
-
-
-
