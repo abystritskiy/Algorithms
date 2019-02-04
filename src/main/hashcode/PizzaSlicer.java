@@ -6,6 +6,23 @@ public class PizzaSlicer {
     static int low;
     static int high;
 
+    public PizzaSlicer(String fileName) {
+        this.readInput(fileName);
+
+
+        String out = fileName.replaceAll(".in", ".out");
+
+
+        writeOutput(
+                out,
+                new int[][]{
+                        {0, 0, 2, 1},
+                        {0, 2, 2, 2},
+                        {0, 3, 2, 4}
+                }
+        );
+    }
+
     /**
      * Read the data file
      *
@@ -23,7 +40,6 @@ public class PizzaSlicer {
             low = Integer.parseInt(initLine[2]);
             high = Integer.parseInt(initLine[3]);
 
-
             pizzaGrid = new boolean[rows][cols];
             for (int y = 0; y < rows; y++) {
                 char row[] = bufferedReader.readLine().trim().toCharArray();
@@ -39,7 +55,6 @@ public class PizzaSlicer {
         } catch (IOException ex) {
             System.out.println("Error reading file '" + fileName + "'");
         }
-
     }
 
     /**
@@ -74,21 +89,11 @@ public class PizzaSlicer {
      * @param args
      */
     public static void main(String[] args) {
-        PizzaSlicer ps = new PizzaSlicer();
-        ps.readInput("input/hashcode/pizza/small.in");
-
+        PizzaSlicer ps = new PizzaSlicer("input/hashcode/pizza/small.in");
         Pizza pizza = new Pizza(ps.pizzaGrid);
 
         // pure debug
         System.out.println(Arrays.deepToString(ps.pizzaGrid));
-        ps.writeOutput(
-                "input/hashcode/pizza/small.out",
-                new int[][]{
-                        {0, 0, 2, 1},
-                        {0, 2, 2, 2},
-                        {0, 3, 2, 4}
-                }
-        );
 
 
     }
