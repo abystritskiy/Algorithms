@@ -3,12 +3,12 @@ import java.lang.*;
 public class Pizza {
     public final int rows;
     public final int cols;
-    public final boolean[][] grid;
+    public final char[][] grid;
 
-    public final boolean TOMATO = true;
-    public final boolean MASHROOM = false;
+    public final char TOMATO = 'T';
+    public final char MASHROOM = 'M';
 
-    public Pizza(boolean[][] grid) {
+    public Pizza(char[][] grid) {
         this.grid = grid;
         this.rows = grid.length;
         this.cols = grid[0].length;
@@ -26,7 +26,7 @@ public class Pizza {
         int tomatoes = 0;
         for (int y = rowStart; y <= rowEnd; y++) {
             for (int x = colStart; x <= colEnd; x++) {
-                if (this.grid[y][x]) {
+                if (this.grid[y][x] == 'T') {
                     tomatoes++;
                 }
             }
