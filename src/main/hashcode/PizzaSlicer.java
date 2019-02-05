@@ -5,6 +5,7 @@ public class PizzaSlicer {
     char[][] grid;
     int low, high;
 
+    /* pre-computed options */
     HashMap<String, int[][]> heatedPizza;
 
     /* possible slice sizes*/
@@ -17,7 +18,7 @@ public class PizzaSlicer {
      */
     public PizzaSlicer(String fileName) {
         readInput(fileName);
-        sizes = calcSizes();
+        calcSizes();
         heatPizza();
     }
 
@@ -37,21 +38,57 @@ public class PizzaSlicer {
             }
         }
 
-        sizes = calcSizes();
+        calcSizes();
         heatPizza();
     }
 
     /**
-     * Heat pizza cut into different slices
+     * Heat pizza (tomatoes count pre-computation) cut by different slices
      */
     private void heatPizza() {
-        for (Slice size: sizes) {
-            int[][] heatedPizza = new int[grid.length][grid[0].length];
+        int pizzaRows = grid.length;
+        int pizzaCols = grid[0].length;
 
-            int sizeRows = size.rows;
-            int sizeCols = size.cols;
+        HashMap<String, int[][]> pizzaCache = new HashMap<>();
+        for (Slice size : sizes) {
+            if (!size.toString().equals("{3, 1}")) {
+                continue;
+            }
+            int[][] heatedPizzaSlice = new int[pizzaRows + 1][pizzaCols + 1];
 
+            int sliceRows = size.rows;
+            int sliceCols = size.cols;
+
+            int yStart = 0;
+            int xStart = 0;
+            int yEnd = sliceRows - 1;
+            int xEnd = sliceCols - 1;
+
+//            for (int yStart=0; yStart<pizzaRows-sliceRows; yStart++) {
+//                for (int xStart=0; xStart<pizzaCols-sliceCols; xStart++) {
+//
+//                }
+//            }
+            while (yEnd < pizzaRows && xEnd < pizzaCols) {
+                int tomatoes = 0;
+                for (int y = yStart; y <= yEnd; y++) {
+                    for (int x = xStart; x <= xEnd; x++) {
+                        if (grid[y][x] == 'T') {
+                            tomatoes++;
+                        }
+                    }
+                }
+                heatedPizzaSlice[yEnd+1][xEnd+1] = tomatoes;
+                yStart++;
+                xStart++;
+                yEnd++;
+                xEnd++;
+            }
+
+            String cacheKey = sliceRows+":"+sliceCols;
+            pizzaCache.put(cacheKey, heatedPizzaSlice);
         }
+        heatedPizza = pizzaCache;
     }
 
     /**
@@ -61,10 +98,17 @@ public class PizzaSlicer {
      *
      * @return
      */
-    private List<Slice> calcSizes() {
+    private void calcSizes() {
+        int pizzaRows = grid.length;
+        int pizzaCols = grid[0].length;
+
+
         List<Slice> options = new ArrayList<>();
         for (int i = high; i >= 1; i--) {
             for (int j = 1; j <= high; j++) {
+                if (i > pizzaRows || j > pizzaCols) {
+                    continue;
+                }
                 if (i * j <= high) {
                     Slice size = new Slice(i, j);
                     options.add(size);
@@ -72,7 +116,7 @@ public class PizzaSlicer {
             }
         }
         options.sort(Collections.reverseOrder());
-        return options;
+        sizes = options;
     }
 
 
@@ -139,7 +183,7 @@ public class PizzaSlicer {
      * @return
      */
     private String getOutFileName(String inFileName) {
-       return inFileName.replaceAll(".in", ".out");
+        return inFileName.replaceAll(".in", ".out");
     }
 
     /**
@@ -148,22 +192,13 @@ public class PizzaSlicer {
      * @param args
      */
     public static void main(String[] args) {
-        PizzaSlicer ps = new PizzaSlicer("input/hashcode/pizza/small.in");
+        PizzaSlicer ps = new PizzaSlicer("input/hashcode/pizza/example.in");
 //        PizzaSlicer ps = new PizzaSlicer(7, 6);
         Pizza pizza = new Pizza(ps.grid);
+        pizza.printPizza();
+        System.out.println(ps.sizes);
+        System.out.println(Arrays.deepToString(ps.heatedPizza.get("1:3")));
 
-
-
-        // pure debug
-        for (char[] row: ps.grid) {
-            System.out.println(Arrays.toString(row));
-        }
-
-        System.out.println("\n");
-        // pure debug
-        for (Slice size: ps.sizes) {
-            System.out.println(size);
-        }
     }
 
 }
