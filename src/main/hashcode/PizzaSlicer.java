@@ -5,11 +5,8 @@ public class PizzaSlicer {
     char[][] grid;
     int low, high;
 
-    /* pre-computed options */
-    HashMap<String, int[][]> heatedPizza;
-
     /* possible slice sizes*/
-    List<Slice> sizes;
+    private List<Slice> sizes;
 
     /**
      * Constructor - reads pizza from the file
@@ -19,7 +16,6 @@ public class PizzaSlicer {
     public PizzaSlicer(String fileName) {
         readInput(fileName);
         calcSizes();
-        heatPizza();
     }
 
     /**
@@ -34,61 +30,17 @@ public class PizzaSlicer {
         grid = new char[rows][cols];
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
-                grid[y][x] = (Math.random() > 0.5 ? 'T' : 'M');
+                grid[y][x] = (Math.random() > 0.5 ? Pizza.TOMATO : Pizza.MUSHROOM);
             }
         }
-
         calcSizes();
-        heatPizza();
     }
 
     /**
-     * Heat pizza (tomatoes count pre-computation) cut by different slices
+     * All the magic happens here
      */
-    private void heatPizza() {
-        int pizzaRows = grid.length;
-        int pizzaCols = grid[0].length;
+    public void sliceIt() {
 
-        HashMap<String, int[][]> pizzaCache = new HashMap<>();
-        for (Slice size : sizes) {
-            if (!size.toString().equals("{3, 1}")) {
-                continue;
-            }
-            int[][] heatedPizzaSlice = new int[pizzaRows + 1][pizzaCols + 1];
-
-            int sliceRows = size.rows;
-            int sliceCols = size.cols;
-
-            int yStart = 0;
-            int xStart = 0;
-            int yEnd = sliceRows - 1;
-            int xEnd = sliceCols - 1;
-
-//            for (int yStart=0; yStart<pizzaRows-sliceRows; yStart++) {
-//                for (int xStart=0; xStart<pizzaCols-sliceCols; xStart++) {
-//
-//                }
-//            }
-            while (yEnd < pizzaRows && xEnd < pizzaCols) {
-                int tomatoes = 0;
-                for (int y = yStart; y <= yEnd; y++) {
-                    for (int x = xStart; x <= xEnd; x++) {
-                        if (grid[y][x] == 'T') {
-                            tomatoes++;
-                        }
-                    }
-                }
-                heatedPizzaSlice[yEnd+1][xEnd+1] = tomatoes;
-                yStart++;
-                xStart++;
-                yEnd++;
-                xEnd++;
-            }
-
-            String cacheKey = sliceRows+":"+sliceCols;
-            pizzaCache.put(cacheKey, heatedPizzaSlice);
-        }
-        heatedPizza = pizzaCache;
     }
 
     /**
@@ -102,23 +54,20 @@ public class PizzaSlicer {
         int pizzaRows = grid.length;
         int pizzaCols = grid[0].length;
 
-
-        List<Slice> options = new ArrayList<>();
+        sizes = new ArrayList<>();
         for (int i = high; i >= 1; i--) {
             for (int j = 1; j <= high; j++) {
                 if (i > pizzaRows || j > pizzaCols) {
                     continue;
                 }
                 if (i * j <= high) {
-                    Slice size = new Slice(i, j);
-                    options.add(size);
+                    Slice size = new Slice(i, j, grid);
+                    sizes.add(size);
                 }
             }
         }
-        options.sort(Collections.reverseOrder());
-        sizes = options;
+        sizes.sort(Collections.reverseOrder());
     }
-
 
     /**
      * Read the data file
@@ -193,11 +142,9 @@ public class PizzaSlicer {
      */
     public static void main(String[] args) {
         PizzaSlicer ps = new PizzaSlicer("input/hashcode/pizza/example.in");
-//        PizzaSlicer ps = new PizzaSlicer(7, 6);
         Pizza pizza = new Pizza(ps.grid);
         pizza.printPizza();
         System.out.println(ps.sizes);
-        System.out.println(Arrays.deepToString(ps.heatedPizza.get("1:3")));
 
     }
 
