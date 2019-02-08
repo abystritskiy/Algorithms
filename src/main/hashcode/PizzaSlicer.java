@@ -37,9 +37,49 @@ public class PizzaSlicer {
     }
 
     /**
-     * All the magic happens here
+     * All the magic starts here
      */
     public void sliceIt() {
+        Integer coveredArea = 0;
+        Integer checkedArea = 0;
+        List<int[]> pieces = new ArrayList<>();
+
+        SliceTask task0 = new SliceTask(
+                sizes.get(0), 0, 0, coveredArea, grid, checkedArea, pieces
+        );
+
+
+        Queue<SliceTask> queue = new LinkedList();
+        queue.add(task0);
+
+        while (queue.size() != 0) {
+            SliceTask task = queue.poll();
+            if (task.isValidSlice(low)) {
+                task.addBottomToQueue(queue);
+                task.addRightToQueue(queue);
+            } else {
+                // check next size;
+                // if no next size - shift position (maybe random)
+            }
+
+        }
+    }
+
+    /**
+     * All the magic happens here - part two
+     */
+    public void sliceIt(int y0, int x0) {
+        int[] start = getNextStartingPoint();
+        ArrayList<Slice> possibleSlices = getPossibleSlices(start);
+    }
+
+    public int[] getNextStartingPoint(List<int[]>)
+    {
+
+    }
+
+    public List<Slice> getPossibleSlices(int []);
+    {
 
     }
 
@@ -57,7 +97,7 @@ public class PizzaSlicer {
         sizes = new ArrayList<>();
         for (int i = high; i >= 1; i--) {
             for (int j = 1; j <= high; j++) {
-                if (i > pizzaRows || j > pizzaCols) {
+                if (i > pizzaRows || j > pizzaCols || i * j < 2 * low) {
                     continue;
                 }
                 if (i * j <= high) {
@@ -148,4 +188,54 @@ public class PizzaSlicer {
 
     }
 
+    /**
+     * Utility class to work with the stack
+     */
+    private class SliceTask {
+        Slice slice;
+        final int y0;
+        final int x0;
+        final char[][] pizza;
+        Integer coveredArea;
+        Integer checkedArea;
+        List<int[]> pieces;
+
+        private SliceTask(Slice slice,
+                          int y0, int x0,
+                          int coveredArea, char[][] pizza,
+                          int checkedArea, List<int[]> pieces) {
+            this.slice = slice;
+            this.y0 = y0;
+            this.x0 = x0;
+            this.pizza = pizza;
+            this.coveredArea = coveredArea;
+            this.checkedArea = checkedArea;
+            this.pieces = pieces;
+        }
+
+        private boolean coveredAll() {
+            return coveredArea == pizza.length * pizza[0].length;
+        }
+
+        private boolean isValidSlice(int low) {
+            return slice.isValidSlice(y0, x0, low) && slice.fitsThePizza(y0, x0);
+        }
+
+        private void addBottomToQueue(Queue<SliceTask> queue) {
+            SliceTask taskBottom = new SliceTask(
+                    sizes.get(0), this.y0 + this.slice.rows, this.x0,
+                    coveredArea, grid, checkedArea, pieces
+            );
+            queue.add(taskBottom);
+        }
+
+        private void addRightToQueue(Queue<SliceTask> queue) {
+            SliceTask taskRight = new SliceTask(
+                    sizes.get(0), this.y0, this.x0 + this.slice.cols,
+                    coveredArea, grid, checkedArea, pieces
+            );
+            queue.add(taskRight);
+        }
+
+    }
 }

@@ -52,7 +52,7 @@ class Slice implements Comparable<Slice> {
      * @param low
      * @return
      */
-    public boolean iaValidSlice(int y0, int x0, int low)
+    public boolean isValidSlice(int y0, int x0, int low)
     {
         return fitsThePizza(y0, x0) && heated[y0][x0] >= low && (area - heated[y0][x0]) >= low;
     }
@@ -77,7 +77,8 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
-     * Print slice content
+     * Print slice content - just for debug
+     *
      * @param y0
      * @param x0
      */
@@ -91,7 +92,7 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
-     * Compare to method
+     * "Compare to" method
      *
      * @param that
      * @return
@@ -101,7 +102,7 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
-     * To string - what else to add?
+     * To string - just for debug
      *
      * @return
      */

@@ -4,7 +4,7 @@ public class Decryptor {
         StringBuffer descrypted = new StringBuffer();
         int step2 = 1;
 
-        //       c   r   i   m   e
+        //        c   r   i   m   e
         // step1  99 114 105 109 101
         // step2 100 214 319 428 529
         // step3 100 110 111 116 113
