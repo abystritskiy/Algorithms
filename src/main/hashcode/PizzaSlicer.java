@@ -8,6 +8,9 @@ public class PizzaSlicer {
     /* possible slice sizes*/
     private List<Slice> sizes;
 
+    /* next start point slice sizes*/
+    private List<List> next;
+
     /**
      * Constructor - reads pizza from the file
      *
@@ -16,71 +19,32 @@ public class PizzaSlicer {
     public PizzaSlicer(String fileName) {
         readInput(fileName);
         calcSizes();
-    }
-
-    /**
-     * Constructor - generates random rows*cols pizza
-     *
-     * @param rows
-     * @param cols
-     */
-    public PizzaSlicer(int rows, int cols, int low, int high) {
-        this.low = low;
-        this.high = low;
-        grid = new char[rows][cols];
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < cols; x++) {
-                grid[y][x] = (Math.random() > 0.5 ? Pizza.TOMATO : Pizza.MUSHROOM);
-            }
-        }
-        calcSizes();
+        next = new ArrayList<>();
+        ArrayList<Integer> firstStartPoint = new ArrayList<>();
+        firstStartPoint.add(0);
+        firstStartPoint.add(0);
+        next.add(firstStartPoint);
     }
 
     /**
      * All the magic starts here
      */
-    public void sliceIt() {
-        Integer coveredArea = 0;
-        Integer checkedArea = 0;
-        List<int[]> pieces = new ArrayList<>();
+    public boolean sliceIt() {
+        List<Integer> point = next.get(next.size()-1);
 
-        SliceTask task0 = new SliceTask(
-                sizes.get(0), 0, 0, coveredArea, grid, checkedArea, pieces
-        );
+        for (Slice size: sizes) {
+           if (size.isValidSlice(point.get(0), point.get(1), low)) {
+                //place slice
 
-
-        Queue<SliceTask> queue = new LinkedList();
-        queue.add(task0);
-
-        while (queue.size() != 0) {
-            SliceTask task = queue.poll();
-            if (task.isValidSlice(low)) {
-                task.addBottomToQueue(queue);
-                task.addRightToQueue(queue);
-            } else {
-                // check next size;
-                // if no next size - shift position (maybe random)
-            }
-
+               if (sliceIt()) {
+                   return true;
+               } else {
+                   //roll back
+                   // remove last added 2 (1) points
+               }
+           }
         }
-    }
-
-    /**
-     * All the magic happens here - part two
-     */
-    public void sliceIt(int y0, int x0) {
-        int[] start = getNextStartingPoint();
-        ArrayList<Slice> possibleSlices = getPossibleSlices(start);
-    }
-
-    public int[] getNextStartingPoint(List<int[]>)
-    {
-
-    }
-
-    public List<Slice> getPossibleSlices(int []);
-    {
-
+        return false;
     }
 
     /**
@@ -184,58 +148,8 @@ public class PizzaSlicer {
         PizzaSlicer ps = new PizzaSlicer("input/hashcode/pizza/example.in");
         Pizza pizza = new Pizza(ps.grid);
         pizza.printPizza();
+        System.out.println();
         System.out.println(ps.sizes);
-
     }
 
-    /**
-     * Utility class to work with the stack
-     */
-    private class SliceTask {
-        Slice slice;
-        final int y0;
-        final int x0;
-        final char[][] pizza;
-        Integer coveredArea;
-        Integer checkedArea;
-        List<int[]> pieces;
-
-        private SliceTask(Slice slice,
-                          int y0, int x0,
-                          int coveredArea, char[][] pizza,
-                          int checkedArea, List<int[]> pieces) {
-            this.slice = slice;
-            this.y0 = y0;
-            this.x0 = x0;
-            this.pizza = pizza;
-            this.coveredArea = coveredArea;
-            this.checkedArea = checkedArea;
-            this.pieces = pieces;
-        }
-
-        private boolean coveredAll() {
-            return coveredArea == pizza.length * pizza[0].length;
-        }
-
-        private boolean isValidSlice(int low) {
-            return slice.isValidSlice(y0, x0, low) && slice.fitsThePizza(y0, x0);
-        }
-
-        private void addBottomToQueue(Queue<SliceTask> queue) {
-            SliceTask taskBottom = new SliceTask(
-                    sizes.get(0), this.y0 + this.slice.rows, this.x0,
-                    coveredArea, grid, checkedArea, pieces
-            );
-            queue.add(taskBottom);
-        }
-
-        private void addRightToQueue(Queue<SliceTask> queue) {
-            SliceTask taskRight = new SliceTask(
-                    sizes.get(0), this.y0, this.x0 + this.slice.cols,
-                    coveredArea, grid, checkedArea, pieces
-            );
-            queue.add(taskRight);
-        }
-
-    }
 }
