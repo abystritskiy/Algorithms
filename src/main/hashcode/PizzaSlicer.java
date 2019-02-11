@@ -5,11 +5,17 @@ public class PizzaSlicer {
     char[][] grid;
     int low, high;
 
-    /* possible slice sizes*/
+    /* possible slice sizes */
     private List<Slice> sizes;
 
-    /* next start point slice sizes*/
+    /* next start point for slice */
     private List<List> next;
+
+    /* cells used in slices */
+    private boolean[][] sliced;
+
+    /* slices left-top right bottom coordinates (y,x)*/
+    public List<int[]> coordinates;
 
     /**
      * Constructor - reads pizza from the file
@@ -19,10 +25,15 @@ public class PizzaSlicer {
     public PizzaSlicer(String fileName) {
         readInput(fileName);
         calcSizes();
-        next = new ArrayList<>();
+
+        sliced = new boolean[grid.length][grid[0].length];
+        coordinates = new ArrayList<>();
+
         ArrayList<Integer> firstStartPoint = new ArrayList<>();
         firstStartPoint.add(0);
         firstStartPoint.add(0);
+
+        next = new ArrayList<>();
         next.add(firstStartPoint);
     }
 
@@ -30,22 +41,39 @@ public class PizzaSlicer {
      * All the magic starts here
      */
     public boolean sliceIt() {
-        List<Integer> point = next.get(next.size()-1);
+        List<Integer> point = next.get(next.size() - 1);
+        int y0 = point.get(0);
+        int x0 = point.get(1);
 
-        for (Slice size: sizes) {
-           if (size.isValidSlice(point.get(0), point.get(1), low)) {
-                //place slice
+        for (Slice size : sizes) {
+            if (size.isValidSlice(y0, x0, low, sliced)) {
+                int[] coordinate = new int[]{y0, x0, y0 + size.rows, x0 + size.cols};
+                coordinates.add(coordinate);
+                size.setSliced(y0, x0, sliced);
 
-               if (sliceIt()) {
-                   return true;
-               } else {
-                   //roll back
-                   // remove last added 2 (1) points
-               }
-           }
+                List<Integer> rightPoint = size.getNextRightPoint(y0, x0, sliced);
+                List<Integer> bottomPoint = size.getNextBottomPoint(y0, x0, sliced);
+
+                if (rightPoint.size()>0) {
+                    next.add(rightPoint);
+                }
+                if (bottomPoint.size()>0) {
+                    next.add(bottomPoint);
+                }
+
+                if (sliceIt()) {
+                    return true;
+                } else {
+                    //roll back
+                    // remove last added 2 (1) points
+                }
+            }
         }
         return false;
     }
+
+
+
 
     /**
      * Get available slice sizes

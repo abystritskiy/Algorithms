@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Sortable sizes class
  * Also has pre-calculated pizza coverage
@@ -24,8 +27,8 @@ class Slice implements Comparable<Slice> {
      */
     public int[][] heat() {
         int[][] cache = new int[pizza.length][pizza[0].length];
-        for (int y=0; y<=pizza.length-rows; y++) {
-            for (int x=0; x<=pizza[0].length-cols; x++) {
+        for (int y = 0; y <= pizza.length - rows; y++) {
+            for (int x = 0; x <= pizza[0].length - cols; x++) {
                 cache[y][x] = countTomatoes(y, x);
             }
         }
@@ -41,7 +44,7 @@ class Slice implements Comparable<Slice> {
      * @return
      */
     public boolean fitsThePizza(int y0, int x0) {
-        return (y0+rows <= pizza.length && x0+rows<=pizza[0].length);
+        return (y0 + rows <= pizza.length && x0 + rows <= pizza[0].length);
     }
 
     /**
@@ -52,9 +55,91 @@ class Slice implements Comparable<Slice> {
      * @param low
      * @return
      */
-    public boolean isValidSlice(int y0, int x0, int low)
-    {
+    public boolean isValidSlice(int y0, int x0, int low, boolean[][] sliced) {
+        for (int y = y0; y < y0 + this.rows; y++) {
+            for (int x = x0; x < x0 + this.cols; x++) {
+                if (sliced[y][x]) {
+                    return false;
+                }
+            }
+        }
         return fitsThePizza(y0, x0) && heated[y0][x0] >= low && (area - heated[y0][x0]) >= low;
+    }
+
+    /**
+     * Cut the slice out of pizza
+     *
+     * @param y0
+     * @param x0
+     * @param sliced
+     */
+    public void setSliced(int y0, int x0, boolean[][] sliced) {
+        for (int y = y0; y < y0 + this.rows; y++) {
+            for (int x = x0; x < x0 + this.cols; x++) {
+                sliced[y][x] = true;
+            }
+        }
+    }
+
+    /**
+     * Revert 'setSliced'
+     *
+     * @param y0
+     * @param x0
+     * @param sliced
+     */
+    public void setUnsliced(int y0, int x0, boolean[][] sliced) {
+        for (int y = y0; y < y0 + this.rows; y++) {
+            for (int x = x0; x < x0 + this.cols; x++) {
+                sliced[y][x] = false;
+            }
+        }
+    }
+
+    /**
+     * Get next point to the right
+     *
+     * @param y0
+     * @param x0
+     * @param sliced
+     * @return
+     */
+    public List<Integer> getNextRightPoint(int y0, int x0, boolean[][] sliced) {
+        int y = y0;
+        while (y < y0 + this.rows) {
+            if (!sliced[y][x0+this.cols]) {
+                List<Integer> point = new ArrayList<>();
+                point.add(y);
+                point.add(x0+this.cols);
+                return point;
+            } else {
+                y++;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get next point to the bottom
+     *
+     * @param y0
+     * @param x0
+     * @param sliced
+     * @return
+     */
+    public List<Integer> getNextBottomPoint(int y0, int x0, boolean[][] sliced) {
+        int x = x0;
+        while (x < x0 + this.cols) {
+            if (!sliced[y0+this.rows][x]) {
+                List<Integer> point = new ArrayList<>();
+                point.add(y0+this.rows);
+                point.add(x);
+                return point;
+            } else {
+                x++;
+            }
+        }
+        return null;
     }
 
     /**
@@ -66,8 +151,8 @@ class Slice implements Comparable<Slice> {
      */
     private int countTomatoes(int y0, int x0) {
         int tomatoes = 0;
-        for (int y=y0; y<y0+rows; y++) {
-            for (int x=x0; x<x0+cols; x++) {
+        for (int y = y0; y < y0 + rows; y++) {
+            for (int x = x0; x < x0 + cols; x++) {
                 if (pizza[y][x] == Pizza.TOMATO) {
                     tomatoes++;
                 }
@@ -83,8 +168,8 @@ class Slice implements Comparable<Slice> {
      * @param x0
      */
     public void print(int y0, int x0) {
-        for (int y=y0; y<y0+rows; y++) {
-            for (int x=x0; x<x0+cols; x++) {
+        for (int y = y0; y < y0 + rows; y++) {
+            for (int x = x0; x < x0 + cols; x++) {
                 System.out.println(pizza[y][x] + " ");
             }
             System.out.println();
@@ -107,6 +192,6 @@ class Slice implements Comparable<Slice> {
      * @return
      */
     public String toString() {
-        return "{"+rows+", "+cols+"}";
+        return "{" + rows + ", " + cols + "}";
     }
 }
