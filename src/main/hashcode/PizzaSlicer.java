@@ -14,8 +14,17 @@ public class PizzaSlicer {
     /* cells used in slices */
     private boolean[][] sliced;
 
-    /* slices left-top right bottom coordinates (y,x)*/
+    /* slices left-top right bottom coordinates (y,x) */
     public List<int[]> coordinates;
+
+    /* total maximum area of the slices */
+    public int max = 0;
+
+    /* slices left-top right bottom temp-coordinates (y,x) */
+    public List<int[]> tempCoordinates;
+
+    /* total temp-maximum area of the slices */
+    public int tempMax = 0;
 
     /**
      * Constructor - reads pizza from the file
@@ -28,6 +37,7 @@ public class PizzaSlicer {
 
         sliced = new boolean[grid.length][grid[0].length];
         coordinates = new ArrayList<>();
+        tempCoordinates = new ArrayList<>();
 
         ArrayList<Integer> firstStartPoint = new ArrayList<>();
         firstStartPoint.add(0);
@@ -42,37 +52,47 @@ public class PizzaSlicer {
      */
     public boolean sliceIt() {
         List<Integer> point = next.get(next.size() - 1);
+        next.remove(next.size() - 1);
+        String nextTS = next.toString();
         int y0 = point.get(0);
         int x0 = point.get(1);
 
         for (Slice size : sizes) {
             if (size.isValidSlice(y0, x0, low, sliced)) {
-                int[] coordinate = new int[]{y0, x0, y0 + size.rows, x0 + size.cols};
-                coordinates.add(coordinate);
+                tempCoordinates.add(
+                        new int[]{y0, x0, y0 + size.rows - 1, x0 + size.cols - 1}
+                );
                 size.setSliced(y0, x0, sliced);
 
                 List<Integer> rightPoint = size.getNextRightPoint(y0, x0, sliced);
                 List<Integer> bottomPoint = size.getNextBottomPoint(y0, x0, sliced);
 
-                if (rightPoint.size()>0) {
+                if (rightPoint != null && rightPoint.size()>0) {
                     next.add(rightPoint);
                 }
-                if (bottomPoint.size()>0) {
+                if (bottomPoint != null && bottomPoint.size()>0) {
                     next.add(bottomPoint);
                 }
+                tempMax += size.rows * size.cols;
 
                 if (sliceIt()) {
                     return true;
                 } else {
+
+                    if (tempMax > max) {
+                        max = tempMax;
+                        coordinates = tempCoordinates;
+                    }
+
                     //roll back
-                    // remove last added 2 (1) points
+                    tempMax -= size.rows * size.cols;
+                    size.setUnsliced(y0, x0, sliced);
+                    tempCoordinates.remove(tempCoordinates.size()-1);
                 }
             }
         }
         return false;
     }
-
-
 
 
     /**
@@ -178,6 +198,13 @@ public class PizzaSlicer {
         pizza.printPizza();
         System.out.println();
         System.out.println(ps.sizes);
+
+        ps.sliceIt();
+        System.out.println("Max: " + ps.max);
+        System.out.println();
+        for (int[] coord: ps.coordinates) {
+            System.out.println(Arrays.toString(coord));
+        }
     }
 
 }

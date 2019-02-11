@@ -56,6 +56,9 @@ class Slice implements Comparable<Slice> {
      * @return
      */
     public boolean isValidSlice(int y0, int x0, int low, boolean[][] sliced) {
+        if (!this.fitsThePizza(y0, x0) || heated[y0][x0] < low || (area - heated[y0][x0]) < low) {
+            return false;
+        }
         for (int y = y0; y < y0 + this.rows; y++) {
             for (int x = x0; x < x0 + this.cols; x++) {
                 if (sliced[y][x]) {
@@ -63,7 +66,7 @@ class Slice implements Comparable<Slice> {
                 }
             }
         }
-        return fitsThePizza(y0, x0) && heated[y0][x0] >= low && (area - heated[y0][x0]) >= low;
+        return true;
     }
 
     /**
@@ -105,12 +108,15 @@ class Slice implements Comparable<Slice> {
      * @return
      */
     public List<Integer> getNextRightPoint(int y0, int x0, boolean[][] sliced) {
+        if (x0 + this.cols >= pizza[0].length) {
+            return null;
+        }
         int y = y0;
         while (y < y0 + this.rows) {
-            if (!sliced[y][x0+this.cols]) {
+            if (!sliced[y][x0 + this.cols]) {
                 List<Integer> point = new ArrayList<>();
                 point.add(y);
-                point.add(x0+this.cols);
+                point.add(x0 + this.cols);
                 return point;
             } else {
                 y++;
@@ -128,11 +134,14 @@ class Slice implements Comparable<Slice> {
      * @return
      */
     public List<Integer> getNextBottomPoint(int y0, int x0, boolean[][] sliced) {
+        if (y0 + this.rows >= pizza.length) {
+            return null;
+        }
         int x = x0;
         while (x < x0 + this.cols) {
-            if (!sliced[y0+this.rows][x]) {
+            if (!sliced[y0 + this.rows][x]) {
                 List<Integer> point = new ArrayList<>();
-                point.add(y0+this.rows);
+                point.add(y0 + this.rows);
                 point.add(x);
                 return point;
             } else {
