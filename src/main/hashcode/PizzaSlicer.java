@@ -8,9 +8,6 @@ public class PizzaSlicer {
     /* possible slice sizes */
     private List<Slice> sizes;
 
-    /* next start point for slice */
-    private LinkedList<List> next;
-
     /* cells used in slices */
     private boolean[][] sliced;
 
@@ -18,13 +15,13 @@ public class PizzaSlicer {
     public List<int[]> coordinates;
 
     /* total maximum area of the slices */
-    public int max = 0;
+    public Integer max = 0;
 
     /* slices left-top right bottom temp-coordinates (y,x) */
     public List<int[]> tempCoordinates;
 
     /* total temp-maximum area of the slices */
-    public int tempMax = 0;
+    public Integer tempMax = 0;
 
     /**
      * Constructor - reads pizza from the file
@@ -39,18 +36,9 @@ public class PizzaSlicer {
         coordinates = new ArrayList<>();
         tempCoordinates = new ArrayList<>();
 
-        ArrayList<Integer> firstStartPoint = new ArrayList<>();
-        firstStartPoint.add(0);
-        firstStartPoint.add(0);
-
-        next = new LinkedList<>();
-        next.add(firstStartPoint);
     }
 
-    /**
-     * All the magic starts here
-     */
-    public boolean sliceIt() {
+    public boolean slice( List<List<Integer>> points) {
 
         if (tempMax == grid.length * grid[0].length) {
             max = tempMax;
@@ -58,30 +46,30 @@ public class PizzaSlicer {
             return true;
         }
 
-        if (next.size() == 0) {
-            return true;
+        if (points.isEmpty()) {
+            return false;
         }
 
-        List<Integer> point = next.get(0);
-        int y0 = point.get(0);
-        int x0 = point.get(1);
-        next.remove(0);
+        for (List<Integer> point : points) {
+            int y0 = point.get(0);
+            int x0 = point.get(1);
 
-        for (Slice size : sizes) {
-            size.locate(y0, x0);
-            String sts = size.toString();
-            if (size.isValidSlice(low, sliced)) {
+            for (Slice size : sizes) {
+                size.locate(y0, x0);
 
-                if (size.toString().equals("{3, 2}{0, 0}")) {
-                    int bpoint = 0;
+
+                if (!size.isValidSlice(low, sliced)) {
+                    continue;
                 }
 
+                // save current slices
                 tempCoordinates.add(
-                    new int[]{y0, x0, y0 + size.rows - 1, x0 + size.cols - 1}
+                        new int[]{y0, x0, y0 + size.rows - 1, x0 + size.cols - 1}
                 );
                 tempMax += size.rows * size.cols;
                 size.setSliced(sliced);
 
+                List<List<Integer>> next = new ArrayList<>();
                 List<Integer> rightPoint = size.getNextRightPoint(sliced);
                 List<Integer> bottomPoint = size.getNextBottomPoint(sliced);
 
@@ -92,21 +80,24 @@ public class PizzaSlicer {
                     next.add(bottomPoint);
                 }
 
-                if (sliceIt()) {
+                if (slice(next)) {
                     return true;
-                }
-                size.locate(y0, x0);
+                } else {
+                    size.locate(y0,x0);
+                    if (tempMax > max) {
+                        max = tempMax;
+                        coordinates = new ArrayList<>(tempCoordinates);
+                    }
 
-                if (tempMax > max) {
-                    max = tempMax;
-                    coordinates = new ArrayList<>(tempCoordinates);
+                    // rollback
+                    size.setUnsliced(sliced);
+                    tempMax -= size.rows * size.cols;
+                    tempCoordinates.remove(tempCoordinates.size()-1);
                 }
-                //roll back
-                tempMax -= size.rows * size.cols;
-                size.setUnsliced(sliced);
-                tempCoordinates.remove(tempCoordinates.size()-1);
             }
+
         }
+
         return false;
     }
 
@@ -209,17 +200,26 @@ public class PizzaSlicer {
      * @param args
      */
     public static void main(String[] args) {
-        PizzaSlicer ps = new PizzaSlicer("input/hashcode/pizza/example.in");
-        Pizza pizza = new Pizza(ps.grid);
-        pizza.printPizza();
-        System.out.println();
+        long startTime = System.nanoTime();
+        PizzaSlicer ps = new PizzaSlicer("input/hashcode/pizza/medium.in");
 
-        ps.sliceIt();
+        List<Integer> firstStartPoint = new ArrayList<>();
+        firstStartPoint.add(0);
+        firstStartPoint.add(0);
+
+        List<List<Integer>> next = new ArrayList<>();
+        next.add(firstStartPoint);
+
+        ps.slice(next);
         System.out.println("Max: " + ps.max);
         System.out.println();
-        for (int[] coord: ps.coordinates) {
+        for (int[] coord : ps.coordinates) {
             System.out.println(Arrays.toString(coord));
         }
+
+        long endTime = System.nanoTime();
+
+        System.out.println("execution time: " + (endTime-startTime)/1000000);
     }
 
 }
