@@ -35,6 +35,28 @@ public class PizzaSlicer {
         sliced = new boolean[grid.length][grid[0].length];
         coordinates = new ArrayList<>();
         tempCoordinates = new ArrayList<>();
+    }
+
+    /**
+     * Constructor - generates random rows*cols pizza
+     *
+     * @param rows
+     * @param cols
+     */
+    public PizzaSlicer(int rows, int cols, int low, int high) {
+        this.low = low;
+        this.high = low;
+        grid = new char[rows][cols];
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < cols; x++) {
+                grid[y][x] = (Math.random() > 0.5 ? Pizza.TOMATO : Pizza.MUSHROOM);
+            }
+        }
+        calcSizes();
+
+        sliced = new boolean[grid.length][grid[0].length];
+        coordinates = new ArrayList<>();
+        tempCoordinates = new ArrayList<>();
 
     }
 
@@ -201,7 +223,11 @@ public class PizzaSlicer {
      */
     public static void main(String[] args) {
         long startTime = System.nanoTime();
-        PizzaSlicer ps = new PizzaSlicer("input/hashcode/pizza/medium.in");
+        PizzaSlicer ps = new PizzaSlicer("input/hashcode/pizza/10x10.in");
+
+
+//        Pizza pizza = new Pizza(ps.grid);
+//        pizza.printPizza();
 
         List<Integer> firstStartPoint = new ArrayList<>();
         firstStartPoint.add(0);
@@ -222,4 +248,11 @@ public class PizzaSlicer {
         System.out.println("execution time: " + (endTime-startTime)/1000000);
     }
 
+
+    public static void generatePizza() {
+        PizzaSlicer ps = new PizzaSlicer(11, 11, 2, 6) ;
+
+        Pizza pizza = new Pizza(ps.grid);
+        pizza.printPizza();
+    }
 }
