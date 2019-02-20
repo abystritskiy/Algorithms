@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.*;
 
 public class PizzaSlicer {
@@ -25,22 +24,25 @@ public class PizzaSlicer {
     /* total temp-maximum area of the slices */
     public Integer tempMax = 0;
 
-    /* Last max value updated - break if it stucks */
+    /* Last max value updated - break if it is stuck */
     long lastMaxUpdate;
 
     /**
      * Constructor - reads pizza from the file
      *
-     * @param fileName
      */
-    public PizzaSlicer(String fileName) {
-        readInput(fileName);
-        calcSizes();
+    public PizzaSlicer(int low, int high, char[][] grid) {
+        this.low = low;
+        this.high = high;
+        this.grid = grid;
         this.lastMaxUpdate = System.currentTimeMillis();
+        this.sliced = new boolean[grid.length][grid[0].length];
+        this.coordinates = new ArrayList<>();
+        this.tempCoordinates = new ArrayList<>();
 
-        sliced = new boolean[grid.length][grid[0].length];
-        coordinates = new ArrayList<>();
-        tempCoordinates = new ArrayList<>();
+        calcSizes();
+
+
     }
 
     /**
@@ -170,137 +172,24 @@ public class PizzaSlicer {
         sizes.sort(Collections.reverseOrder());
     }
 
-    /**
-     * Read the data file
-     *
-     * @param fileName
-     * @return
-     */
-    private void readInput(String fileName) {
-        try {
-            FileReader fileReader = new FileReader(fileName);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            String[] initLine = bufferedReader.readLine().trim().split(" ");
-
-            int rows = Integer.parseInt(initLine[0]), cols = Integer.parseInt(initLine[1]);
-            low = Integer.parseInt(initLine[2]);
-            high = Integer.parseInt(initLine[3]);
-
-            grid = new char[rows][cols];
-            for (int y = 0; y < rows; y++) {
-                char row[] = bufferedReader.readLine().trim().toCharArray();
-                grid[y] = row;
-            }
-
-            bufferedReader.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Unable to open file '" + fileName + "'");
-        } catch (IOException ex) {
-            System.out.println("Error reading file '" + fileName + "'");
-        }
-    }
 
     /**
-     * Write the results to file
-     *
-     * @param fileName
-     * @param out
-     */
-    private void writeOutput(String fileName, int[][] out) {
-        try {
-            FileWriter fileWriter = new FileWriter(fileName);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-            bufferedWriter.write(String.valueOf(out.length));
-            bufferedWriter.newLine();
-
-            for (int[] row : out) {
-                bufferedWriter.write(row[0] + " " + row[1] + " " + row[2] + " " + row[3]);
-                bufferedWriter.newLine();
-            }
-
-            bufferedWriter.close();
-        } catch (IOException ex) {
-            System.out.println("Error writing to file '" + fileName + "'");
-        }
-    }
-
-    /**
-     * Write output from XXX.in to XXX.out
-     *
-     * @param inFileName
-     * @return
-     */
-    private String getOutFileName(String inFileName) {
-        return inFileName.replaceAll(".in", ".out");
-    }
-
-    /**
-     * All the fun happens here
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        long startTime = System.currentTimeMillis();
-        String dataFile = "input/hashcode/pizza/10x10.in";
-        PizzaSlicer ps = new PizzaSlicer(dataFile);
-
-
-        Pizza pizza = new Pizza(ps.grid);
-        pizza.printPizza();
-
-        List<Integer> firstStartPoint = new ArrayList<>();
-        firstStartPoint.add(0);
-        firstStartPoint.add(0);
-
-        List<List<Integer>> next = new ArrayList<>();
-        next.add(firstStartPoint);
-
-        ps.slice(next);
-        System.out.println("Max: " + ps.max);
-        System.out.println();
-        for (int[] coord : ps.coordinates) {
-            System.out.println(Arrays.toString(coord));
-        }
-
-        long endTime = System.currentTimeMillis();
-
-        System.out.println("execution time: " + (endTime-startTime));
-        System.out.println();
-
-        showCovered(ps.coordinates, dataFile);
-    }
-
-
-    public static void generatePizza() {
-        PizzaSlicer ps = new PizzaSlicer(11, 11, 2, 6) ;
-
-        Pizza pizza = new Pizza(ps.grid);
-        pizza.printPizza();
-    }
-
-    /**
-     * Visual tests
+     * For visual testing only
      *
      * @param slices
-     * @param pizzaFile
      */
-    public static void showCovered(List<int[]> slices, String pizzaFile) {
-
-        PizzaSlicer ps = new PizzaSlicer(pizzaFile);
-        Pizza pizza = new Pizza(ps.grid);
+    public void showCovered(List<int[]> slices) {
+        Pizza pizza = new Pizza(this.grid);
 
         for (int[] slice : slices) {
             int y0 = slice[0], x0 = slice[1], y1 = slice[2], x1 = slice[3];
 
             for (int y=y0; y<=y1; y++) {
                 for (int x=x0; x<=x1; x++) {
-                    ps.grid[y][x] = 176;
+                    this.grid[y][x] = 176;
                 }
             }
         }
         pizza.printPizza();
-
     }
 }
