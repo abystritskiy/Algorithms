@@ -29,9 +29,6 @@ class Slice implements Comparable<Slice> {
      * @return
      */
     public int[][] heat() {
-        if (this.toString().equals("{3, 1}{0, 0}")) {
-            int  bkp = 0;
-        }
         int[][] cache = new int[pizza.length][pizza[0].length];
         for (int y = 0; y <= pizza.length - rows; y++) {
             for (int x = 0; x <= pizza[0].length - cols; x++) {
