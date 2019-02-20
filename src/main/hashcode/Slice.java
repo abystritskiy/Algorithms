@@ -67,8 +67,6 @@ class Slice implements Comparable<Slice> {
      */
     public boolean isValidSlice(int low, boolean[][] sliced) {
         if (!this.fitsThePizza() || heated[y0][x0] < low || (area - heated[y0][x0]) < low) {
-            int x1 = heated[y0][x0];
-            int x2 = (area - heated[y0][x0]);
             return false;
         }
         for (int y = y0; y < y0 + this.rows; y++) {
@@ -113,7 +111,7 @@ class Slice implements Comparable<Slice> {
      * @param sliced
      * @return
      */
-    public List<Integer> getNextRightPoint(boolean[][] sliced) {
+    public List<Integer> getNextRightTopPoint(boolean[][] sliced) {
         if (x0 + this.cols >= pizza[0].length) {
             return null;
         }
@@ -132,12 +130,84 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
+     * Get next point to the right
+     *
+     * @param sliced
+     * @return
+     */
+    public List<Integer> getNextRightBottomPoint(boolean[][] sliced) {
+        if (x0 + this.cols >= pizza[0].length) {
+            return null;
+        }
+        int y = y0;
+        while (y >= 0) {
+            if (!sliced[y][x0 + this.cols]) {
+                List<Integer> point = new ArrayList<>();
+                point.add(y);
+                point.add(x0 + this.cols);
+                return point;
+            } else {
+                y--;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get next point to the left
+     *
+     * @param sliced
+     * @return
+     */
+    public List<Integer> getNextLeftTopPoint(boolean[][] sliced) {
+        if (x0 - this.cols < 0) {
+            return null;
+        }
+        int y = y0;
+        while (y < y0 + this.rows) {
+            if (!sliced[y][x0 + this.cols]) {
+                List<Integer> point = new ArrayList<>();
+                point.add(y);
+                point.add(x0 - this.cols);
+                return point;
+            } else {
+                y++;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get next point to the left
+     *
+     * @param sliced
+     * @return
+     */
+    public List<Integer> getNextLeftBottomPoint(boolean[][] sliced) {
+        if (x0 - this.cols < 0) {
+            return null;
+        }
+        int y = y0;
+        while (y >= 0) {
+            if (!sliced[y][x0 + this.cols]) {
+                List<Integer> point = new ArrayList<>();
+                point.add(y);
+                point.add(x0 - this.cols);
+                return point;
+            } else {
+                y--;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get next point to the bottom
      *
      * @param sliced
      * @return
      */
-    public List<Integer> getNextBottomPoint(boolean[][] sliced) {
+    public List<Integer> getNextBottomLeftPoint(boolean[][] sliced) {
         if (y0 + this.rows >= pizza.length) {
             return null;
         }
@@ -150,6 +220,78 @@ class Slice implements Comparable<Slice> {
                 return point;
             } else {
                 x++;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get next point to the bottom
+     *
+     * @param sliced
+     * @return
+     */
+    public List<Integer> getNextBottomRightPoint(boolean[][] sliced) {
+        if (y0 + this.rows >= pizza.length) {
+            return null;
+        }
+        int x = x0;
+        while (x >=0) {
+            if (!sliced[y0 + this.rows][x]) {
+                List<Integer> point = new ArrayList<>();
+                point.add(y0 + this.rows);
+                point.add(x);
+                return point;
+            } else {
+                x--;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get next point to the top
+     *
+     * @param sliced
+     * @return
+     */
+    public List<Integer> getNextTopLeftPoint(boolean[][] sliced) {
+        if (y0 - this.rows < 0) {
+            return null;
+        }
+        int x = x0;
+        while (x < x0 + this.cols) {
+            if (!sliced[y0 - this.rows][x]) {
+                List<Integer> point = new ArrayList<>();
+                point.add(y0 + this.rows);
+                point.add(x);
+                return point;
+            } else {
+                x++;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get next point to the top
+     *
+     * @param sliced
+     * @return
+     */
+    public List<Integer> getNextTopRightPoint(boolean[][] sliced, boolean reversed) {
+        if (y0 - this.rows < 0) {
+            return null;
+        }
+        int x = x0;
+        while (x >= 0) {
+            if (!sliced[y0 - this.rows][x]) {
+                List<Integer> point = new ArrayList<>();
+                point.add(y0 + this.rows);
+                point.add(x);
+                return point;
+            } else {
+                x--;
             }
         }
         return null;

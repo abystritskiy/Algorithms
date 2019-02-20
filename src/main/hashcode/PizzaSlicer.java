@@ -1,10 +1,15 @@
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class PizzaSlicer {
     public static final int INTERVAL = 120000;
 
     char[][] grid;
     int low, high;
+
+    /* defines where the start and where to place new slice */
+    public final Orientation orientation;
 
     /* possible slice sizes */
     private List<Slice> sizes;
@@ -25,24 +30,22 @@ public class PizzaSlicer {
     public Integer tempMax = 0;
 
     /* Last max value updated - break if it is stuck */
-    long lastMaxUpdate;
+    long lastMaxUpdateTime;
 
     /**
      * Constructor - reads pizza from the file
-     *
      */
-    public PizzaSlicer(int low, int high, char[][] grid) {
+    public PizzaSlicer(int low, int high, char[][] grid, Orientation orientation) {
         this.low = low;
         this.high = high;
         this.grid = grid;
-        this.lastMaxUpdate = System.currentTimeMillis();
+        this.orientation = orientation;
+        this.lastMaxUpdateTime = System.currentTimeMillis();
         this.sliced = new boolean[grid.length][grid[0].length];
         this.coordinates = new ArrayList<>();
         this.tempCoordinates = new ArrayList<>();
 
         calcSizes();
-
-
     }
 
     /**
@@ -51,10 +54,11 @@ public class PizzaSlicer {
      * @param rows
      * @param cols
      */
-    public PizzaSlicer(int rows, int cols, int low, int high) {
+    public PizzaSlicer(int rows, int cols, int low, int high, Orientation orientation) {
         this.low = low;
         this.high = low;
-        this.lastMaxUpdate = System.currentTimeMillis();
+        this.orientation = orientation;
+        this.lastMaxUpdateTime = System.currentTimeMillis();
         grid = new char[rows][cols];
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
@@ -71,13 +75,13 @@ public class PizzaSlicer {
 
     /**
      * Recursively try to place slices and measure the covered size
-     * Try bigger first.
+     * Try bigger first. Uses backtracking strategy
      *
      * @param points
      * @return
      */
-    public boolean slice( List<List<Integer>> points) {
-
+    public boolean slice(List<List<Integer>> points) {
+        // if whole pizza is covered, no need to search further
         if (tempMax == grid.length * grid[0].length) {
             max = tempMax;
             coordinates = new ArrayList<>(tempCoordinates);
@@ -88,8 +92,8 @@ public class PizzaSlicer {
             return false;
         }
 
-        // If we stuck for 2 minutes - let's move over
-        if (System.currentTimeMillis() - lastMaxUpdate > INTERVAL) {
+        // If we stuck for too long - let's move over
+        if (System.currentTimeMillis() - lastMaxUpdateTime > INTERVAL) {
             return false;
         }
 
@@ -100,49 +104,87 @@ public class PizzaSlicer {
             for (Slice size : sizes) {
                 size.locate(y0, x0);
 
-
+                // check if slice contains required number of ingredients
+                // and do not overlaps with other slices
                 if (!size.isValidSlice(low, sliced)) {
                     continue;
                 }
 
+                // memorizing temporary results
                 tempCoordinates.add(
                     new int[]{y0, x0, y0 + size.rows - 1, x0 + size.cols - 1}
                 );
                 tempMax += size.rows * size.cols;
                 size.setSliced(sliced);
 
-                List<List<Integer>> next = new ArrayList<>();
-                List<Integer> rightPoint = size.getNextRightPoint(sliced);
-                List<Integer> bottomPoint = size.getNextBottomPoint(sliced);
-
-                if (rightPoint != null && rightPoint.size()>0) {
-                    next.add(rightPoint);
-                }
-                if (bottomPoint != null && bottomPoint.size()>0) {
-                    next.add(bottomPoint);
-                }
+                List<List<Integer>> next = getNextPoints(this.orientation, size);
 
                 if (slice(next)) {
                     return true;
                 } else {
-                    size.locate(y0,x0);
+                    size.locate(y0, x0);
                     if (tempMax > max) {
                         max = tempMax;
                         System.out.println("new max: " + max);
-                        lastMaxUpdate = System.currentTimeMillis();
+                        lastMaxUpdateTime = System.currentTimeMillis();
                         coordinates = new ArrayList<>(tempCoordinates);
                     }
 
                     // rollback
                     size.setUnsliced(sliced);
                     tempMax -= size.rows * size.cols;
-                    tempCoordinates.remove(tempCoordinates.size()-1);
+                    tempCoordinates.remove(tempCoordinates.size() - 1);
                 }
             }
 
         }
 
         return false;
+    }
+
+    /**
+     * Get next points to put slices.
+     * Ideally, need to move around starting point to find the
+     * most optimal solution, but in practice it is too expensive
+     *
+     * @param orientation
+     * @param size
+     * @return
+     */
+    private List<List<Integer>> getNextPoints(Orientation orientation, Slice size) {
+        List<List<Integer>> next = new ArrayList<>();
+        if (orientation == Orientation.TOP_LEFT) {
+            List<Integer> rightPoint = size.getNextRightTopPoint(sliced);
+            List<Integer> bottomPoint = size.getNextBottomLeftPoint(sliced);
+
+            if (rightPoint != null && rightPoint.size() > 0) {
+                next.add(rightPoint);
+            }
+            if (bottomPoint != null && bottomPoint.size() > 0) {
+                next.add(bottomPoint);
+            }
+        } else if (orientation == Orientation.TOP_RIGHT) {
+            List<Integer> leftPoint = size.getNextLeftTopPoint(sliced);
+            List<Integer> bottomPoint = size.getNextBottomRightPoint(sliced);
+
+            if (leftPoint != null && leftPoint.size() > 0) {
+                next.add(leftPoint);
+            }
+            if (bottomPoint != null && bottomPoint.size() > 0) {
+                next.add(bottomPoint);
+            }
+        }else if (orientation == Orientation.BOTTOM_LEFT) {
+            List<Integer> leftPoint = size.getNextRightTopPoint(sliced);
+            List<Integer> bottomPoint = size.getNextTopLeftPoint(sliced);
+
+            if (leftPoint != null && leftPoint.size() > 0) {
+                next.add(leftPoint);
+            }
+            if (bottomPoint != null && bottomPoint.size() > 0) {
+                next.add(bottomPoint);
+            }
+        }
+        return next;
     }
 
 
@@ -184,8 +226,8 @@ public class PizzaSlicer {
         for (int[] slice : slices) {
             int y0 = slice[0], x0 = slice[1], y1 = slice[2], x1 = slice[3];
 
-            for (int y=y0; y<=y1; y++) {
-                for (int x=x0; x<=x1; x++) {
+            for (int y = y0; y <= y1; y++) {
+                for (int x = x0; x <= x1; x++) {
                     this.grid[y][x] = 176;
                 }
             }

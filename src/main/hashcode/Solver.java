@@ -1,11 +1,8 @@
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Solver {
-
-
 
     /**
      * All the fun happens here
@@ -18,7 +15,7 @@ public class Solver {
 
         Input input = new Input(dataFile);
 
-        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid);
+        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT);
         Pizza pizza = new Pizza(ps.grid);
 
         pizza.printPizza();
@@ -26,6 +23,8 @@ public class Solver {
         List<Integer> firstStartPoint = new ArrayList<>();
         firstStartPoint.add(0);
         firstStartPoint.add(0);
+//        firstStartPoint.add(pizza.rows-1);
+//        firstStartPoint.add(pizza.cols-1);
 
         List<List<Integer>> next = new ArrayList<>();
         next.add(firstStartPoint);
