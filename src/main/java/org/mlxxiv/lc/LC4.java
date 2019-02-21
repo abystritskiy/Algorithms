@@ -1,4 +1,4 @@
-/**
+package org.mlxxiv.lc; /**
  * https://leetcode.com/problems/median-of-two-sorted-arrays/
  * Difficulty: hard
  */

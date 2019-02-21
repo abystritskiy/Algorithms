@@ -1,9 +1,10 @@
+package org.mlxxiv.hashcode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Solver {
-
     /**
      * All the fun happens here
      *
@@ -15,14 +16,14 @@ public class Solver {
 
         Input input = new Input(dataFile);
 
-        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT);
+        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_RIGHT);
         Pizza pizza = new Pizza(ps.grid);
 
         pizza.printPizza();
 
         List<Integer> firstStartPoint = new ArrayList<>();
         firstStartPoint.add(0);
-        firstStartPoint.add(0);
+        firstStartPoint.add(9);
 //        firstStartPoint.add(pizza.rows-1);
 //        firstStartPoint.add(pizza.cols-1);
 
@@ -42,5 +43,16 @@ public class Solver {
         System.out.println();
 
         ps.showCovered(ps.coordinates);
+    }
+
+    /**
+     * Orientation defines in which direction new slices are placed and
+     * which corner is defined with y0, x0 coordinates
+     */
+    enum Orientation {
+        TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT
     }
 }

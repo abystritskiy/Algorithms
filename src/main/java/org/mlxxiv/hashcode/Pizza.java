@@ -1,3 +1,5 @@
+package org.mlxxiv.hashcode;
+
 public class Pizza {
     public final int rows;
     public final int cols;

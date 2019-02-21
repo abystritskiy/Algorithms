@@ -1,3 +1,5 @@
+package org.mlxxiv.lc;
+
 /**
  * https://leetcode.com/problems/container-with-most-water/
  * Difficulty: medium

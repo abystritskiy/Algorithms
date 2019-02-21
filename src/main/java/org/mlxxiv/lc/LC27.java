@@ -1,4 +1,4 @@
-/**
+package org.mlxxiv.lc; /**
  * https://leetcode.com/problems/remove-element/
  * Difficulty: easy
  */

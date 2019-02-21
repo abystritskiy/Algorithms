@@ -1,3 +1,5 @@
+package org.mlxxiv.hashcode;
+
 import java.io.*;
 
 public class Input {

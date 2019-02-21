@@ -1,3 +1,5 @@
+package org.mlxxiv.lc;
+
 /**
  * https://leetcode.com/problems/swap-nodes-in-pairs/
  * Difficulty: medium

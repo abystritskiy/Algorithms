@@ -1,3 +1,5 @@
+package org.mlxxiv.hashcode;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +11,7 @@ public class PizzaSlicer {
     int low, high;
 
     /* defines where the start and where to place new slice */
-    public final Orientation orientation;
+    public final Solver.Orientation orientation;
 
     /* possible slice sizes */
     private List<Slice> sizes;
@@ -35,7 +37,7 @@ public class PizzaSlicer {
     /**
      * Constructor - reads pizza from the file
      */
-    public PizzaSlicer(int low, int high, char[][] grid, Orientation orientation) {
+    public PizzaSlicer(int low, int high, char[][] grid, Solver.Orientation orientation) {
         this.low = low;
         this.high = high;
         this.grid = grid;
@@ -54,7 +56,7 @@ public class PizzaSlicer {
      * @param rows
      * @param cols
      */
-    public PizzaSlicer(int rows, int cols, int low, int high, Orientation orientation) {
+    public PizzaSlicer(int rows, int cols, int low, int high, Solver.Orientation orientation) {
         this.low = low;
         this.high = low;
         this.orientation = orientation;
@@ -102,7 +104,7 @@ public class PizzaSlicer {
             int x0 = point.get(1);
 
             for (Slice size : sizes) {
-                size.locate(y0, x0);
+                size.locate(y0, x0, orientation);
 
                 // check if slice contains required number of ingredients
                 // and do not overlaps with other slices
@@ -111,18 +113,16 @@ public class PizzaSlicer {
                 }
 
                 // memorizing temporary results
-                tempCoordinates.add(
-                    new int[]{y0, x0, y0 + size.rows - 1, x0 + size.cols - 1}
-                );
+                rememberSlicePosition(size);
                 tempMax += size.rows * size.cols;
                 size.setSliced(sliced);
 
-                List<List<Integer>> next = getNextPoints(this.orientation, size);
+                List<List<Integer>> next = getNextPoints(size, this.orientation);
 
                 if (slice(next)) {
                     return true;
                 } else {
-                    size.locate(y0, x0);
+                    size.locate(y0, x0, orientation);
                     if (tempMax > max) {
                         max = tempMax;
                         System.out.println("new max: " + max);
@@ -136,10 +136,22 @@ public class PizzaSlicer {
                     tempCoordinates.remove(tempCoordinates.size() - 1);
                 }
             }
-
         }
-
         return false;
+    }
+
+    /**
+     * Remember slice top-left and bottom-right coordintates
+     * @param slice
+     */
+    public void rememberSlicePosition(Slice slice)
+    {
+        int[] leftTop = slice.getLeftTop();
+        int yS = leftTop[0];
+        int xS = leftTop[1];
+        tempCoordinates.add(
+            new int[]{yS, xS, yS + slice.rows - 1, xS + slice.cols - 1}
+        );
     }
 
     /**
@@ -151,9 +163,9 @@ public class PizzaSlicer {
      * @param size
      * @return
      */
-    private List<List<Integer>> getNextPoints(Orientation orientation, Slice size) {
+    private List<List<Integer>> getNextPoints(Slice size, Solver.Orientation orientation) {
         List<List<Integer>> next = new ArrayList<>();
-        if (orientation == Orientation.TOP_LEFT) {
+        if (orientation == Solver.Orientation.TOP_LEFT) {
             List<Integer> rightPoint = size.getNextRightTopPoint(sliced);
             List<Integer> bottomPoint = size.getNextBottomLeftPoint(sliced);
 
@@ -163,7 +175,7 @@ public class PizzaSlicer {
             if (bottomPoint != null && bottomPoint.size() > 0) {
                 next.add(bottomPoint);
             }
-        } else if (orientation == Orientation.TOP_RIGHT) {
+        } else if (orientation == Solver.Orientation.TOP_RIGHT) {
             List<Integer> leftPoint = size.getNextLeftTopPoint(sliced);
             List<Integer> bottomPoint = size.getNextBottomRightPoint(sliced);
 
@@ -173,15 +185,25 @@ public class PizzaSlicer {
             if (bottomPoint != null && bottomPoint.size() > 0) {
                 next.add(bottomPoint);
             }
-        }else if (orientation == Orientation.BOTTOM_LEFT) {
-            List<Integer> leftPoint = size.getNextRightTopPoint(sliced);
-            List<Integer> bottomPoint = size.getNextTopLeftPoint(sliced);
+        } else if (orientation == Solver.Orientation.BOTTOM_LEFT) {
+            List<Integer> rightPoint = size.getNextRightBottomPoint(sliced);
+            List<Integer> topPoint = size.getNextTopLeftPoint(sliced);
+
+            if (rightPoint != null && rightPoint.size() > 0) {
+                next.add(rightPoint);
+            }
+            if (topPoint != null && topPoint.size() > 0) {
+                next.add(topPoint);
+            }
+        } else if (orientation == Solver.Orientation.BOTTOM_RIGHT) {
+            List<Integer> leftPoint = size.getNextLeftBottomPoint(sliced);
+            List<Integer> topPoint = size.getNextTopRightPoint(sliced);
 
             if (leftPoint != null && leftPoint.size() > 0) {
                 next.add(leftPoint);
             }
-            if (bottomPoint != null && bottomPoint.size() > 0) {
-                next.add(bottomPoint);
+            if (topPoint != null && topPoint.size() > 0) {
+                next.add(topPoint);
             }
         }
         return next;

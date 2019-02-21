@@ -1,3 +1,5 @@
+package org.mlxxiv.hashcode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ class Slice implements Comparable<Slice> {
 
     public int y0 = 0;
     public int x0 = 0;
+    public Solver.Orientation orientation;
 
     public Slice(int rows, int colls, char[][] grid) {
         this.rows = rows;
@@ -44,9 +47,10 @@ class Slice implements Comparable<Slice> {
      * @param y0
      * @param x0
      */
-    public void locate(int y0, int x0) {
+    public void locate(int y0, int x0, Solver.Orientation orientation) {
         this.y0 = y0;
         this.x0 = x0;
+        this.orientation = orientation;
     }
 
     /**
@@ -56,6 +60,13 @@ class Slice implements Comparable<Slice> {
      * @return
      */
     public boolean fitsThePizza() {
+        if (orientation == Solver.Orientation.TOP_RIGHT) {
+            return (y0 + rows <= pizza.length && x0 - cols + 1 >= 0);
+        } else if (orientation == Solver.Orientation.BOTTOM_LEFT) {
+            return (y0 - rows + 1 >= 0 && x0 - cols + 1 >= 0);
+        } else if (orientation == Solver.Orientation.BOTTOM_RIGHT) {
+            return (y0 - rows + 1 >= 0 && x0 - cols + 1 >= 0);
+        }
         return (y0 + rows <= pizza.length && x0 + cols <= pizza[0].length);
     }
 
@@ -66,11 +77,16 @@ class Slice implements Comparable<Slice> {
      * @return
      */
     public boolean isValidSlice(int low, boolean[][] sliced) {
-        if (!this.fitsThePizza() || heated[y0][x0] < low || (area - heated[y0][x0]) < low) {
+        int[] leftTop = getLeftTop();
+        int yS = leftTop[0];
+        int xS = leftTop[1];
+
+        if (!this.fitsThePizza() || heated[yS][xS] < low || (area - heated[yS][xS]) < low) {
             return false;
         }
-        for (int y = y0; y < y0 + this.rows; y++) {
-            for (int x = x0; x < x0 + this.cols; x++) {
+
+        for (int y = yS; y < yS + this.rows; y++) {
+            for (int x = xS; x < xS + this.cols; x++) {
                 if (sliced[y][x]) {
                     return false;
                 }
@@ -80,13 +96,39 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
+     * Get top left cell position
+     *
+     * @return
+     */
+    public int[] getLeftTop() {
+        int yS = y0;
+        int xS = x0;
+
+        if (orientation == Solver.Orientation.TOP_RIGHT) {
+            yS = y0;
+            xS = x0 - this.cols + 1;
+        } else if (orientation == Solver.Orientation.BOTTOM_LEFT) {
+            yS = y0 - this.rows + 1;
+            xS = x0;
+        } else if (orientation == Solver.Orientation.BOTTOM_RIGHT) {
+            yS = y0 - this.rows + 1;
+            xS = x0 - this.cols + 1;
+        }
+        return new int[] {yS, xS};
+    }
+
+    /**
      * Cut the slice out of pizza
      *
      * @param sliced
      */
     public void setSliced(boolean[][] sliced) {
-        for (int y = y0; y < y0 + this.rows; y++) {
-            for (int x = x0; x < x0 + this.cols; x++) {
+        int[] leftTop = getLeftTop();
+        int yS = leftTop[0];
+        int xS = leftTop[1];
+
+        for (int y = yS; y < yS + this.rows; y++) {
+            for (int x = xS; x < xS + this.cols; x++) {
                 sliced[y][x] = true;
             }
         }
@@ -98,8 +140,11 @@ class Slice implements Comparable<Slice> {
      * @param sliced
      */
     public void setUnsliced(boolean[][] sliced) {
-        for (int y = y0; y < y0 + this.rows; y++) {
-            for (int x = x0; x < x0 + this.cols; x++) {
+        int[] leftTop = getLeftTop();
+        int yS = leftTop[0];
+        int xS = leftTop[1];
+        for (int y = yS; y < yS + this.rows; y++) {
+            for (int x = xS; x < xS + this.cols; x++) {
                 sliced[y][x] = false;
             }
         }
@@ -165,7 +210,7 @@ class Slice implements Comparable<Slice> {
         }
         int y = y0;
         while (y < y0 + this.rows) {
-            if (!sliced[y][x0 + this.cols]) {
+            if (!sliced[y][x0 - this.cols]) {
                 List<Integer> point = new ArrayList<>();
                 point.add(y);
                 point.add(x0 - this.cols);
@@ -189,7 +234,7 @@ class Slice implements Comparable<Slice> {
         }
         int y = y0;
         while (y >= 0) {
-            if (!sliced[y][x0 + this.cols]) {
+            if (!sliced[y][x0 - this.cols]) {
                 List<Integer> point = new ArrayList<>();
                 point.add(y);
                 point.add(x0 - this.cols);
@@ -236,7 +281,7 @@ class Slice implements Comparable<Slice> {
             return null;
         }
         int x = x0;
-        while (x >=0) {
+        while (x >= x0 - this.cols) {
             if (!sliced[y0 + this.rows][x]) {
                 List<Integer> point = new ArrayList<>();
                 point.add(y0 + this.rows);
@@ -263,7 +308,7 @@ class Slice implements Comparable<Slice> {
         while (x < x0 + this.cols) {
             if (!sliced[y0 - this.rows][x]) {
                 List<Integer> point = new ArrayList<>();
-                point.add(y0 + this.rows);
+                point.add(y0 - this.rows);
                 point.add(x);
                 return point;
             } else {
@@ -279,15 +324,15 @@ class Slice implements Comparable<Slice> {
      * @param sliced
      * @return
      */
-    public List<Integer> getNextTopRightPoint(boolean[][] sliced, boolean reversed) {
+    public List<Integer> getNextTopRightPoint(boolean[][] sliced) {
         if (y0 - this.rows < 0) {
             return null;
         }
         int x = x0;
-        while (x >= 0) {
+        while (x >= x0 - this.cols) {
             if (!sliced[y0 - this.rows][x]) {
                 List<Integer> point = new ArrayList<>();
-                point.add(y0 + this.rows);
+                point.add(y0 - this.rows);
                 point.add(x);
                 return point;
             } else {
@@ -318,8 +363,12 @@ class Slice implements Comparable<Slice> {
      * Print slice content - just for debug
      */
     public void print() {
-        for (int y = y0; y < y0 + rows; y++) {
-            for (int x = x0; x < x0 + cols; x++) {
+        int[] leftTop = getLeftTop();
+        int yS = leftTop[0];
+        int xS = leftTop[1];
+
+        for (int y = yS; y < yS + rows; y++) {
+            for (int x = xS; x < xS + cols; x++) {
                 System.out.println(pizza[y][x] + " ");
             }
             System.out.println();
@@ -343,5 +392,28 @@ class Slice implements Comparable<Slice> {
      */
     public String toString() {
         return "{" + rows + ", " + cols + "}" + "{" + y0 + ", " + x0 + "}";
+    }
+
+    public static void main(String[] args) {
+        char[][] grid = new char[][]{
+                {'M', 'M', 'M', 'T', 'M', 'M', 'T', 'M', 'M', 'T'},
+                {'M', 'T', 'T', 'T', 'M', 'M', 'M', 'M', 'M', 'M'},
+                {'T', 'M', 'M', 'T', 'M', 'T', 'T', 'T', 'M', 'M'},
+                {'M', 'M', 'T', 'M', 'M', 'M', 'M', 'T', 'T', 'M'},
+                {'T', 'T', 'T', 'M', 'T', 'M', 'M', 'M', 'M', 'T'},
+                {'M', 'T', 'M', 'M', 'M', 'M', 'M', 'M', 'T', 'T'},
+                {'T', 'M', 'T', 'T', 'M', 'T', 'M', 'M', 'T', 'M'},
+                {'M', 'T', 'M', 'M', 'M', 'T', 'T', 'M', 'T', 'T'},
+                {'T', 'M', 'M', 'T', 'T', 'T', 'T', 'M', 'M', 'M'},
+                {'T', 'M', 'T', 'M', 'T', 'T', 'T', 'T', 'M', 'T'}
+        };
+        boolean[][] sliced = new boolean[10][10];
+
+        Slice size = new Slice(2, 2, grid);
+        size.locate(4, 5, Solver.Orientation.BOTTOM_RIGHT);
+
+
+        System.out.println(size.getNextTopRightPoint(sliced));
+        System.out.println(size.getNextLeftBottomPoint(sliced));
     }
 }

@@ -1,4 +1,4 @@
-/**
+package org.mlxxiv.lc; /**
  * https://leetcode.com/problems/zigzag-conversion/
  *
  * Difficulty: medium
