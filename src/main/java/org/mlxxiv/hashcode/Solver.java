@@ -5,6 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Solver {
+    /** Input/output object */
+    Input input;
+
+    /* slices left-top right bottom coordinates (y,x) */
+    public List<int[]> results;
+
     /**
      * All the fun happens here
      *
@@ -12,42 +18,47 @@ public class Solver {
      */
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        String dataFile = "input/hashcode/pizza/example.in";
+        String dataFile = "input/hashcode/pizza/10x10.in";
 
         Input input = new Input(dataFile);
 
 
-
         int size = 5;
-        int yShift = 0;
-        int xShift = 0;
-        int y = 0;
-
-
-        while (yShift + y < input.grid.length) {
-            int ySize = (yShift + y + size <= input.grid.length) ? input.grid.length - yShift +1 : size;
-            int xSize = (xShift + x + size <= input.grid[0].length) ? input.grid[0].length - xShift +1 : size;
-            char[][] grid = new char[ySize][xSize];
-
-            for (int y1=yShift-1; y1<ySize; y1++) {
-                for (int x1=yShift-1; y1<ySize; y1++) {
-
-                }
-            }
+        int yBlocks = input.grid.length / size;
+        if (yBlocks * size != input.grid.length) {
+            yBlocks++;
+        }
+        int xBlocks = input.grid[0].length / size;
+        if (xBlocks * size != input.grid[0].length) {
+            xBlocks++;
         }
 
 
+        for (int yI = 0; yI < yBlocks; yI++) {
+            for (int xI = 0; xI < xBlocks; xI++) {
+                int ySize = (yI * size + size <= input.grid.length) ? size : input.grid.length - yI * size;
+                int xSize = (xI * size + size <= input.grid[0].length) ? size : input.grid[0].length - xI * size;
+                char[][] subgrid = new char[ySize][xSize];
+                for (int subY = yI * size; subY < (yI + 1) * size && subY < input.grid.length; subY++) {
+                    for (int subX = xI * size; subX < (xI + 1) * size && subX < input.grid[0].length; subX++) {
+                        subgrid[subY - yI * size][subX - xI * size] = input.grid[subY][subX];
+                    }
+                }
+                Pizza smallpizza = new Pizza(subgrid);
+                smallpizza.printPizza();
 
-        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.BOTTOM_RIGHT);
+            }
+        }
+        System.out.println("----------");
+        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT);
         Pizza pizza = new Pizza(ps.grid);
-
 
 
         pizza.printPizza();
 
         List<Integer> firstStartPoint = new ArrayList<>();
-        firstStartPoint.add(2);
-        firstStartPoint.add(4);
+        firstStartPoint.add(0);
+        firstStartPoint.add(0);
 //        firstStartPoint.add(pizza.rows-1);
 //        firstStartPoint.add(pizza.cols-1);
 
@@ -63,7 +74,7 @@ public class Solver {
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("execution time: " + (endTime-startTime));
+        System.out.println("execution time: " + (endTime - startTime));
         System.out.println();
 
         ps.showCovered(ps.coordinates);
