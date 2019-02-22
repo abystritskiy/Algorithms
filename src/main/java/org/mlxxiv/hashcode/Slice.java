@@ -63,7 +63,7 @@ class Slice implements Comparable<Slice> {
         if (orientation == Solver.Orientation.TOP_RIGHT) {
             return (y0 + rows <= pizza.length && x0 - cols + 1 >= 0);
         } else if (orientation == Solver.Orientation.BOTTOM_LEFT) {
-            return (y0 - rows + 1 >= 0 && x0 - cols + 1 >= 0);
+            return (y0 - rows + 1 >= 0 && cols <= pizza[0].length);
         } else if (orientation == Solver.Orientation.BOTTOM_RIGHT) {
             return (y0 - rows + 1 >= 0 && x0 - cols + 1 >= 0);
         }

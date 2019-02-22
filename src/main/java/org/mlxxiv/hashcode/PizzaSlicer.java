@@ -236,7 +236,6 @@ public class PizzaSlicer {
         sizes.sort(Collections.reverseOrder());
     }
 
-
     /**
      * For visual testing only
      *
