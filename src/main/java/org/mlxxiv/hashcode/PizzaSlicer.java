@@ -19,6 +19,9 @@ public class PizzaSlicer {
     /* cells used in slices */
     private boolean[][] sliced;
 
+    /* left top coordinates on the whole grid */
+    private int[] leftTop;
+
     /* slices left-top right bottom coordinates (y,x) */
     public List<int[]> coordinates;
 
@@ -37,13 +40,19 @@ public class PizzaSlicer {
     /**
      * Constructor - reads pizza from the file
      */
-    public PizzaSlicer(int low, int high, char[][] grid, Solver.Orientation orientation) {
+    public PizzaSlicer(
+            int low, int high, char[][] grid,
+            Solver.Orientation orientation,
+            boolean[][] sliced, int[] leftTop) {
         this.low = low;
         this.high = high;
         this.grid = grid;
         this.orientation = orientation;
+        this.sliced = sliced;
+        this.leftTop = leftTop;
+//        this.sliced = new boolean[grid.length][grid[0].length];
+
         this.lastMaxUpdateTime = System.currentTimeMillis();
-        this.sliced = new boolean[grid.length][grid[0].length];
         this.coordinates = new ArrayList<>();
         this.tempCoordinates = new ArrayList<>();
 
@@ -104,7 +113,7 @@ public class PizzaSlicer {
             int x0 = point.get(1);
 
             for (Slice size : sizes) {
-                size.locate(y0, x0, orientation);
+                size.locate(y0, x0, orientation, leftTop);
 
                 // check if slice contains required number of ingredients
                 // and do not overlaps with other slices
@@ -122,7 +131,7 @@ public class PizzaSlicer {
                 if (slice(next)) {
                     return true;
                 } else {
-                    size.locate(y0, x0, orientation);
+                    size.locate(y0, x0, orientation, leftTop);
                     if (tempMax > max) {
                         max = tempMax;
                         System.out.println("new max: " + max);
@@ -142,13 +151,13 @@ public class PizzaSlicer {
 
     /**
      * Remember slice top-left and bottom-right coordintates
+     *
      * @param slice
      */
-    public void rememberSlicePosition(Slice slice)
-    {
+    public void rememberSlicePosition(Slice slice) {
         int[] leftTop = slice.getLeftTop();
-        int yS = leftTop[0];
-        int xS = leftTop[1];
+        int yS = leftTop[0] + this.leftTop[0];
+        int xS = leftTop[1] + this.leftTop[1];
         tempCoordinates.add(
             new int[]{yS, xS, yS + slice.rows - 1, xS + slice.cols - 1}
         );

@@ -8,9 +8,12 @@ public class Solver {
     /** Input/output object */
     Input input;
 
-    /* slices left-top right bottom coordinates (y,x) */
-    public List<int[]> results;
 
+    /* slices left-top right bottom coordinates (y,x) */
+    public static List<int[]> results;
+
+    /* total maximum area of the slices */
+    public static Integer globalMax = 0;
     /**
      * All the fun happens here
      *
@@ -22,7 +25,7 @@ public class Solver {
 
         Input input = new Input(dataFile);
 
-
+        results = new ArrayList<>();
         int size = 5;
         int yBlocks = input.grid.length / size;
         if (yBlocks * size != input.grid.length) {
@@ -33,7 +36,7 @@ public class Solver {
             xBlocks++;
         }
 
-
+        boolean[][] sliced = new boolean[input.grid.length][input.grid[0].length];
         for (int yI = 0; yI < yBlocks; yI++) {
             for (int xI = 0; xI < xBlocks; xI++) {
                 int ySize = (yI * size + size <= input.grid.length) ? size : input.grid.length - yI * size;
@@ -44,40 +47,49 @@ public class Solver {
                         subgrid[subY - yI * size][subX - xI * size] = input.grid[subY][subX];
                     }
                 }
-                Pizza smallpizza = new Pizza(subgrid);
-                smallpizza.printPizza();
+//                Pizza smallpizza = new Pizza(subgrid);
+//                smallpizza.printPizza();
 
+                int[] leftTop = new int[] {yI * size, xI * size};
+                PizzaSlicer ps = new PizzaSlicer(
+                        input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced, leftTop
+                );
+
+                List<Integer> firstStartPoint = new ArrayList<>();
+                firstStartPoint.add(0);
+                firstStartPoint.add(0);
+
+                List<List<Integer>> next = new ArrayList<>();
+                next.add(firstStartPoint);
+
+                ps.slice(next);
+
+                globalMax += ps.max;
+                results.addAll(ps.coordinates);
             }
         }
         System.out.println("----------");
-        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT);
-        Pizza pizza = new Pizza(ps.grid);
 
-
-        pizza.printPizza();
-
-        List<Integer> firstStartPoint = new ArrayList<>();
-        firstStartPoint.add(0);
-        firstStartPoint.add(0);
 //        firstStartPoint.add(pizza.rows-1);
 //        firstStartPoint.add(pizza.cols-1);
 
-        List<List<Integer>> next = new ArrayList<>();
-        next.add(firstStartPoint);
 
-        ps.slice(next);
-        System.out.println("Max: " + ps.max);
-        System.out.println();
-        for (int[] coord : ps.coordinates) {
+        System.out.println("Max: " + globalMax);
+
+        for (int[] coord : results) {
             System.out.println(Arrays.toString(coord));
         }
 
+        PizzaSlicer ps = new PizzaSlicer(
+            input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced, new int[] {0,0}
+        );
+ps.showCovered(results);
         long endTime = System.currentTimeMillis();
 
         System.out.println("execution time: " + (endTime - startTime));
         System.out.println();
 
-        ps.showCovered(ps.coordinates);
+//        ps.showCovered(ps.coordinates);
     }
 
     /**
