@@ -17,7 +17,7 @@ public class Solver {
      */
     public static void main(String[] args) {
         // replace with your data file path or move it to args variable
-        String dataFile = "input/hashcode/pizza/100x100.in";
+        String dataFile = "input/hashcode/pizza/big.in";
 
         // start time to measure performance
         long startTime = System.currentTimeMillis();
@@ -28,22 +28,16 @@ public class Solver {
         // surprisingly, this will store calculation results
         results = new ArrayList<>();
 
-        // size of the sub-piece, we're going to cut big pizza to.
-        // on typical data set with 5-10 max slice size, 10 performs the best,
+        // size of the sub-piece, we're going to cut big pizza into.
+        // on typical data set with 5-15 max slice size, 10 performs the best,
         // but whoever has a lot of time, can play with this value
         int size = 10;
 
         // number of blocks on y-scale
-        int yBlocks = input.grid.length / size;
-        if (yBlocks * size != input.grid.length) {
-            yBlocks++;
-        }
+        int yBlocks = (input.grid.length + size - 1) / size;
 
         // number of blocks on x-scale
-        int xBlocks = input.grid[0].length / size;
-        if (xBlocks * size != input.grid[0].length) {
-            xBlocks++;
-        }
+        int xBlocks = (input.grid[0].length + size - 1) / size;
 
         // boolean grid with the same size as pizza - to check if slices do not overlap
         boolean[][] sliced = new boolean[input.grid.length][input.grid[0].length];
@@ -122,22 +116,93 @@ public class Solver {
         PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced);
 
         // visual results of what we've got (before optimization)
-        Pizza pizza =  ps.getCutPizza(results);
+        Pizza pizza = ps.getCutPizza(results);
         pizza.printPizza();
         System.out.println("Total Coverage: " + globalMax);
+        System.out.println("Total Coverage percent: " +
+                ((float) globalMax * 100 ) / (input.grid.length * input.grid[0].length) + "%" );
+
+
+        for (int[] remnant : ps.getRemnants(pizza.grid, size)) {
+            int y0 = remnant[0];
+            int x0 = remnant[1];
+            int y1 = remnant[2];
+            int x1 = remnant[3];
+
+            char[][] subGrid = new char[y1 - y0 + 1][x1 - x0 + 1];
+            for (int y = y0; y <= y1; y++) {
+                for (int x = x0; x <= x1; x++) {
+                    subGrid[y - y0][x - x0] = input.grid[y][x];
+                }
+            }
+
+            for (int[] subCoordinates : getItAll(subGrid, input.low, input.high)) {
+                int[] coordinatesWithCorrectedPosition = new int[]{
+                        subCoordinates[0] + y0,
+                        subCoordinates[1] + x0,
+                        subCoordinates[2] + y0,
+                        subCoordinates[3] + x0,
+                };
+                results.add(coordinatesWithCorrectedPosition);
+            }
+        }
+
+        System.out.println("*****************************");
+        System.out.println("*****************************");
+
+        ps.getCutPizza(results).printPizza();
+
+        System.out.println("Total Coverage (after remnants hunting): " + globalMax);
+        System.out.println("Total Coverage percent (after remnants hunting): " +
+                ((float) globalMax * 100 ) / (input.grid.length * input.grid[0].length) + "%");
         System.out.println("Execution Time: " + (System.currentTimeMillis() - startTime) + " ms");
 
-        List<int[]> remnants = ps.getRemnants(pizza.grid, size);
-        System.out.println(remnants.get(0));
-        System.out.println(remnants.get(remnants.size()-1));
-        // 1, 30, 2, 34
-        // ...
-        // 93, 60, 94, 64
 
         // write output to the file with the same name and *.out instead of *.in
         // input.writeOutput(results);
     }
 
+    /**
+     * Get the maximum of remnants, trying all the orientations
+     *
+     * @param grid
+     * @param low
+     * @param high
+     * @return
+     */
+    private static List<int[]> getItAll(char[][] grid, int low, int high) {
+        Orientation[] orientations = new Orientation[] {
+            Orientation.TOP_LEFT, Orientation.TOP_RIGHT, Orientation.BOTTOM_LEFT, Orientation.BOTTOM_RIGHT
+        };
+        int[] ys = new int[] {0, 0, grid.length - 1, grid.length - 1};
+        int[] xs = new int[] {0, grid[0].length - 1, 0, grid[0].length - 1};
+
+        int max = 0;
+        List<int[]> results = new ArrayList<>();
+
+        for (int i = 0; i <= 3; i++) {
+            Orientation orientation = orientations[i];
+            int y0 = ys[i];
+            int x0 = xs[i];
+
+            boolean[][] subSliced = new boolean[grid.length][grid[0].length];
+            List<Integer> firstStartingPoint = new ArrayList<>();
+            firstStartingPoint.add(y0);
+            firstStartingPoint.add(x0);
+
+            PizzaSlicer pizzaSlicer = new PizzaSlicer(low, high, grid, orientation, subSliced);
+            List<List<Integer>> next = new ArrayList<>();
+            next.add(firstStartingPoint);
+            pizzaSlicer.slice(next);
+
+            if (pizzaSlicer.max > max) {
+                max = pizzaSlicer.max;
+                results = new ArrayList<>(pizzaSlicer.coordinates);
+            }
+        }
+        globalMax += max;
+        return results;
+    }
 
     /**
      * Orientation defines in which direction new slices are placed and

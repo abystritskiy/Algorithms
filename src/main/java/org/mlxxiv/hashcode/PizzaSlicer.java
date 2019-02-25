@@ -306,6 +306,7 @@ public class PizzaSlicer {
                 });
             }
             y++;
+            x = 0;
         }
 
 
