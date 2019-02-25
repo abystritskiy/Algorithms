@@ -8,7 +8,6 @@ public class Solver {
     /** Input/output object */
     Input input;
 
-
     /* slices left-top right bottom coordinates (y,x) */
     public static List<int[]> results;
 
@@ -21,12 +20,12 @@ public class Solver {
      */
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        String dataFile = "input/hashcode/pizza/10x10.in";
+        String dataFile = "input/hashcode/pizza/medium.in";
 
         Input input = new Input(dataFile);
 
         results = new ArrayList<>();
-        int size = 5;
+        int size = 10;
         int yBlocks = input.grid.length / size;
         if (yBlocks * size != input.grid.length) {
             yBlocks++;
@@ -47,17 +46,33 @@ public class Solver {
                         subgrid[subY - yI * size][subX - xI * size] = input.grid[subY][subX];
                     }
                 }
-//                Pizza smallpizza = new Pizza(subgrid);
-//                smallpizza.printPizza();
 
-                int[] leftTop = new int[] {yI * size, xI * size};
-                PizzaSlicer ps = new PizzaSlicer(
-                        input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced, leftTop
-                );
-
+                Orientation orientation;
                 List<Integer> firstStartPoint = new ArrayList<>();
-                firstStartPoint.add(0);
-                firstStartPoint.add(0);
+
+                if (yI % 2 == 0 && xI % 2 == 0) {
+                    orientation = Orientation.TOP_LEFT;
+
+                    firstStartPoint.add(0);
+                    firstStartPoint.add(0);
+                } else if (yI % 2 == 0 && xI % 2 == 1) {
+                    orientation = Orientation.TOP_RIGHT;
+
+                    firstStartPoint.add(0);
+                    firstStartPoint.add(subgrid[0].length-1);
+                } else  if (yI % 2 == 1 && xI % 2 == 0) {
+                    orientation = Orientation.BOTTOM_LEFT;
+
+                    firstStartPoint.add(subgrid.length-1);
+                    firstStartPoint.add(0);
+                } else  {
+                    orientation = Orientation.BOTTOM_RIGHT;
+
+                    firstStartPoint.add(subgrid.length-1);
+                    firstStartPoint.add(subgrid[0].length-1);
+                }
+
+                PizzaSlicer ps = new PizzaSlicer(input.low, input.high, subgrid, orientation, sliced);
 
                 List<List<Integer>> next = new ArrayList<>();
                 next.add(firstStartPoint);
@@ -65,14 +80,17 @@ public class Solver {
                 ps.slice(next);
 
                 globalMax += ps.max;
-                results.addAll(ps.coordinates);
+                for (int[] coord: ps.coordinates) {
+                    int[] coordinatesCorrectedPosition = new int[]{
+                        coord[0] + yI * size,
+                        coord[1] + xI * size,
+                        coord[2] + yI * size,
+                        coord[3] + xI * size,
+                    };
+                    results.add(coordinatesCorrectedPosition);
+                }
             }
         }
-        System.out.println("----------");
-
-//        firstStartPoint.add(pizza.rows-1);
-//        firstStartPoint.add(pizza.cols-1);
-
 
         System.out.println("Max: " + globalMax);
 
@@ -80,16 +98,13 @@ public class Solver {
             System.out.println(Arrays.toString(coord));
         }
 
-        PizzaSlicer ps = new PizzaSlicer(
-            input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced, new int[] {0,0}
-        );
-ps.showCovered(results);
+        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced);
+        ps.showCovered(results);
+
         long endTime = System.currentTimeMillis();
 
         System.out.println("execution time: " + (endTime - startTime));
-        System.out.println();
 
-//        ps.showCovered(ps.coordinates);
     }
 
     /**

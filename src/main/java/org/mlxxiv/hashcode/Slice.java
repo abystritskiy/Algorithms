@@ -16,7 +16,6 @@ class Slice implements Comparable<Slice> {
 
     public int y0 = 0;
     public int x0 = 0;
-    public int[] leftTop;
     public Solver.Orientation orientation;
 
     public Slice(int rows, int colls, char[][] grid) {
@@ -48,11 +47,10 @@ class Slice implements Comparable<Slice> {
      * @param y0
      * @param x0
      */
-    public void locate(int y0, int x0, Solver.Orientation orientation, int[] leftTop) {
+    public void locate(int y0, int x0, Solver.Orientation orientation) {
         this.y0 = y0;
         this.x0 = x0;
         this.orientation = orientation;
-        this.leftTop = leftTop;
     }
 
     /**
@@ -83,9 +81,10 @@ class Slice implements Comparable<Slice> {
         int yS = leftTop[0];
         int xS = leftTop[1];
 
-        if (yS > 9 || xS>9) {
+        if (yS > 4 || xS > 4) {
             boolean bkp = true;
         }
+
         if (!this.fitsThePizza() || heated[yS][xS] < low || (area - heated[yS][xS]) < low) {
             return false;
         }
@@ -119,7 +118,7 @@ class Slice implements Comparable<Slice> {
             yS = y0 - this.rows + 1;
             xS = x0 - this.cols + 1;
         }
-        return new int[]{yS + this.leftTop[0], xS + this.leftTop[1]};
+        return new int[] {yS, xS};
     }
 
     /**
@@ -415,7 +414,7 @@ class Slice implements Comparable<Slice> {
         boolean[][] sliced = new boolean[10][10];
 
         Slice size = new Slice(2, 2, grid);
-        size.locate(4, 5, Solver.Orientation.BOTTOM_RIGHT, new int[]{0,0});
+        size.locate(4, 5, Solver.Orientation.BOTTOM_RIGHT);
 
 
         System.out.println(size.getNextTopRightPoint(sliced));
