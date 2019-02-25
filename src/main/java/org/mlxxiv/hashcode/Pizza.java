@@ -18,12 +18,13 @@ public class Pizza {
      * Print pizza
      */
     public void printPizza() {
-        System.out.println("Size: " + rows + "x" + cols + "; ");
+        System.out.println("Size: " + rows + "x" + cols + "\n");
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
                 System.out.print(grid[y][x] + " ");
             }
             System.out.println();
         }
+        System.out.println();
     }
 }

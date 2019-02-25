@@ -5,9 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class PizzaSlicer {
+    // that's how much (in milliseconds) I am ready to wait for it to finish calculation
     public static final int INTERVAL = 120000;
 
+    // pizza piece - all this nice tomatoes and mushrooms in the form of char array
     char[][] grid;
+
+    // minimal num of each component, maximum number of pieces in the slice
     int low, high;
 
     /* defines where the start and where to place new slice */
@@ -69,12 +73,12 @@ public class PizzaSlicer {
                 grid[y][x] = (Math.random() > 0.5 ? Pizza.TOMATO : Pizza.MUSHROOM);
             }
         }
-        calcSizes();
 
         sliced = new boolean[grid.length][grid[0].length];
         coordinates = new ArrayList<>();
         tempCoordinates = new ArrayList<>();
 
+        calcSizes();
     }
 
     /**
@@ -92,6 +96,7 @@ public class PizzaSlicer {
             return true;
         }
 
+        // nothing to do here - go home!
         if (points.isEmpty()) {
             return false;
         }
@@ -101,10 +106,12 @@ public class PizzaSlicer {
             return false;
         }
 
+        // let's try all the positions we calculated on the previous step
         for (List<Integer> point : points) {
             int y0 = point.get(0);
             int x0 = point.get(1);
 
+            // go through all the possible slice sizes
             for (Slice size : sizes) {
                 size.locate(y0, x0, orientation);
 
@@ -126,6 +133,7 @@ public class PizzaSlicer {
                 } else {
                     size.locate(y0, x0, orientation);
                     if (tempMax > max) {
+                        // we've found something better then we had! lets save it for the future
                         max = tempMax;
                         lastMaxUpdateTime = System.currentTimeMillis();
                         coordinates = new ArrayList<>(tempCoordinates);
@@ -212,9 +220,9 @@ public class PizzaSlicer {
 
 
     /**
-     * Get available slice sizes
-     * sorted from most fitting the 'high'
-     * to least
+     * Get available slice sizes sorted from the biggest to smallest (by size).
+     * No need to include the piece, that does not fit into pizza or
+     * has not enough components
      *
      * @return
      */
@@ -238,7 +246,7 @@ public class PizzaSlicer {
     }
 
     /**
-     * For visual testing only
+     * Show pizza after we 'cut' all we could - for debug only
      *
      * @param slices
      */
@@ -250,6 +258,7 @@ public class PizzaSlicer {
 
             for (int y = y0; y <= y1; y++) {
                 for (int x = x0; x <= x1; x++) {
+                    // just a nice placeholder for 'empty' cell
                     this.grid[y][x] = 176;
                 }
             }

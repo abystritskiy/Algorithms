@@ -1,12 +1,15 @@
 package org.mlxxiv.hashcode;
 
 import java.io.*;
+import java.util.List;
 
 public class Input {
     char[][] grid;
     int low, high;
+    final String filename;
 
     public Input(String fileName) {
+        this.filename = fileName;
         readInput(fileName);
     }
 
@@ -45,15 +48,16 @@ public class Input {
     /**
      * Write the results to file
      *
-     * @param fileName
      * @param out
      */
-    private void writeOutput(String fileName, int[][] out) {
+    public void writeOutput(List<int[]> out) {
+        String outFileName = getOutFileName(this.filename);
+
         try {
-            FileWriter fileWriter = new FileWriter(fileName);
+            FileWriter fileWriter = new FileWriter(outFileName);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-            bufferedWriter.write(String.valueOf(out.length));
+            bufferedWriter.write(String.valueOf(out.size()));
             bufferedWriter.newLine();
 
             for (int[] row : out) {
@@ -63,12 +67,12 @@ public class Input {
 
             bufferedWriter.close();
         } catch (IOException ex) {
-            System.out.println("Error writing to file '" + fileName + "'");
+            System.out.println("Error writing to file '" + outFileName + "'");
         }
     }
 
     /**
-     * Write output from XXX.in to XXX.out
+     * Get output file name - change input file name from XXX.in to XXX.out
      *
      * @param inFileName
      * @return

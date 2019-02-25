@@ -54,7 +54,7 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
-     * Check if the slice (if left top corner coordinates y0, x0)
+     * Check if the slice (y0, x0 - left top corner coordinates)
      * can be fit within the pizza
      *
      * @return
@@ -71,19 +71,17 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
-     * Check if slice has tomatoes and mushrooms more or equals than "low"
+     * Check if slice has tomatoes and mushrooms more or equals than "low".
+     * Check if the slice does not overlap with the previously cut slices
      *
      * @param low
+     * @param sliced
      * @return
      */
     public boolean isValidSlice(int low, boolean[][] sliced) {
         int[] leftTop = getLeftTop();
         int yS = leftTop[0];
         int xS = leftTop[1];
-
-        if (yS > 4 || xS > 4) {
-            boolean bkp = true;
-        }
 
         if (!this.fitsThePizza() || heated[yS][xS] < low || (area - heated[yS][xS]) < low) {
             return false;
@@ -155,7 +153,7 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
-     * Get next point to the right
+     * Get next top point to the right
      *
      * @param sliced
      * @return
@@ -179,7 +177,7 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
-     * Get next point to the right
+     * Get next bottom point to the right
      *
      * @param sliced
      * @return
@@ -203,7 +201,7 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
-     * Get next point to the left
+     * Get next top point to the left
      *
      * @param sliced
      * @return
@@ -227,7 +225,7 @@ class Slice implements Comparable<Slice> {
     }
 
     /**
-     * Get next point to the left
+     * Get next bottom point to the left
      *
      * @param sliced
      * @return
@@ -396,28 +394,5 @@ class Slice implements Comparable<Slice> {
      */
     public String toString() {
         return "{" + rows + ", " + cols + "}" + "{" + y0 + ", " + x0 + "}";
-    }
-
-    public static void main(String[] args) {
-        char[][] grid = new char[][]{
-                {'M', 'M', 'M', 'T', 'M', 'M', 'T', 'M', 'M', 'T'},
-                {'M', 'T', 'T', 'T', 'M', 'M', 'M', 'M', 'M', 'M'},
-                {'T', 'M', 'M', 'T', 'M', 'T', 'T', 'T', 'M', 'M'},
-                {'M', 'M', 'T', 'M', 'M', 'M', 'M', 'T', 'T', 'M'},
-                {'T', 'T', 'T', 'M', 'T', 'M', 'M', 'M', 'M', 'T'},
-                {'M', 'T', 'M', 'M', 'M', 'M', 'M', 'M', 'T', 'T'},
-                {'T', 'M', 'T', 'T', 'M', 'T', 'M', 'M', 'T', 'M'},
-                {'M', 'T', 'M', 'M', 'M', 'T', 'T', 'M', 'T', 'T'},
-                {'T', 'M', 'M', 'T', 'T', 'T', 'T', 'M', 'M', 'M'},
-                {'T', 'M', 'T', 'M', 'T', 'T', 'T', 'T', 'M', 'T'}
-        };
-        boolean[][] sliced = new boolean[10][10];
-
-        Slice size = new Slice(2, 2, grid);
-        size.locate(4, 5, Solver.Orientation.BOTTOM_RIGHT);
-
-
-        System.out.println(size.getNextTopRightPoint(sliced));
-        System.out.println(size.getNextLeftBottomPoint(sliced));
     }
 }
