@@ -17,7 +17,7 @@ public class Solver {
      */
     public static void main(String[] args) {
         // replace with your data file path or move it to args variable
-        String dataFile = "input/hashcode/pizza/small.in";
+        String dataFile = "input/hashcode/pizza/100x100.in";
 
         // start time to measure performance
         long startTime = System.currentTimeMillis();
@@ -71,8 +71,8 @@ public class Solver {
                 // coordinates of the piece that will be "cut" first
                 List<Integer> firstStartingPoint = new ArrayList<>();
 
-                // each block got it's own orientation, in the sequence TL->TR->BL->BR
-                // in my opinion, it will  allow slightly better results, since it will be
+                // Each block gets it's own orientation, in the sequence TL->TR->BL->BR.
+                // In my opinion, it will  allow slightly better results, since it will be
                 // possible to process empty (not covered) spaces on the borders of blocks
                 if (yI % 2 == 0 && xI % 2 == 0) {
                     orientation = Orientation.TOP_LEFT;
@@ -103,7 +103,7 @@ public class Solver {
                 // all the magic is done hear (honestly - no magic, just backtracking with couple conditions)
                 pizzaSlicer.slice(next);
 
-                // summing sliced area on the sub-pieces
+                // summing up sliced area on the sub-pieces
                 globalMax += pizzaSlicer.max;
 
                 // adjusting to 'global' pizza coordinates (from smaller sub-pieces) and summing them up as a result
@@ -121,14 +121,23 @@ public class Solver {
 
         PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced);
 
-        // visual results of what we've got
-        ps.showCovered(results);
+        // visual results of what we've got (before optimization)
+        Pizza pizza =  ps.getCutPizza(results);
+        pizza.printPizza();
         System.out.println("Total Coverage: " + globalMax);
         System.out.println("Execution Time: " + (System.currentTimeMillis() - startTime) + " ms");
+
+        List<int[]> remnants = ps.getRemnants(pizza.grid, size);
+        System.out.println(remnants.get(0));
+        System.out.println(remnants.get(remnants.size()-1));
+        // 1, 30, 2, 34
+        // ...
+        // 93, 60, 94, 64
 
         // write output to the file with the same name and *.out instead of *.in
         // input.writeOutput(results);
     }
+
 
     /**
      * Orientation defines in which direction new slices are placed and

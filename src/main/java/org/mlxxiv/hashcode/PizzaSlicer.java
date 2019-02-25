@@ -159,7 +159,7 @@ public class PizzaSlicer {
         int yS = leftTop[0];
         int xS = leftTop[1];
         tempCoordinates.add(
-            new int[]{yS, xS, yS + slice.rows - 1, xS + slice.cols - 1}
+                new int[]{yS, xS, yS + slice.rows - 1, xS + slice.cols - 1}
         );
     }
 
@@ -246,11 +246,11 @@ public class PizzaSlicer {
     }
 
     /**
-     * Show pizza after we 'cut' all we could - for debug only
+     * Show pizza after we 'cut' all the slices
      *
      * @param slices
      */
-    public void showCovered(List<int[]> slices) {
+    public Pizza getCutPizza(List<int[]> slices) {
         Pizza pizza = new Pizza(this.grid);
 
         for (int[] slice : slices) {
@@ -258,11 +258,57 @@ public class PizzaSlicer {
 
             for (int y = y0; y <= y1; y++) {
                 for (int x = x0; x <= x1; x++) {
-                    // just a nice placeholder for 'empty' cell
-                    this.grid[y][x] = 176;
+                    this.grid[y][x] = Pizza.EMPTY;
                 }
             }
         }
-        pizza.printPizza();
+        return pizza;
+    }
+
+    /**
+     * Try to extract blocks that left
+     *
+     * @param pizza
+     * @param size
+     * @return
+     */
+    public List<int[]> getRemnants(char[][] pizza, int size) {
+        List<int[]> remnants = new ArrayList<>();
+
+        int y = 0;
+        int x = 0;
+
+        while (y < pizza.length) {
+            while (x < pizza[0].length) {
+                if (pizza[y][x] == Pizza.EMPTY || (y - 1 >= 0 && pizza[y - 1][x] != Pizza.EMPTY)) {
+                    x++;
+                    continue;
+                }
+                int y0 = y;
+                int x0 = x;
+                int length = 1;
+                int height = 1;
+
+                while (y+1 < pizza.length && pizza[y+1][x] != Pizza.EMPTY) {
+                    height++;
+                    y++;
+                }
+
+                while (x+1 < pizza[0].length && pizza[y][x+1] != Pizza.EMPTY) {
+                    length++;
+                    x++;
+                }
+
+                x = x+length;
+                y = y0;
+                remnants.add(new int[] {
+                   y0, x0, y0 + height -1, x0 + length - 1
+                });
+            }
+            y++;
+        }
+
+
+        return remnants;
     }
 }
