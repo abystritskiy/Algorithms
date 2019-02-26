@@ -3,18 +3,7 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/hr" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/lc" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/pramp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/hashcode" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/module1" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/module6" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/module3" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/parsing" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/module4" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/module5" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/demos" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
