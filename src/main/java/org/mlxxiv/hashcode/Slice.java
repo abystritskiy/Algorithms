@@ -89,11 +89,11 @@ class Slice implements Comparable<Slice> {
         int[] leftTop = getLeftTop();
         int yS = leftTop[0];
         int xS = leftTop[1];
-        if (yS == 27 && xS == 780) {
-            int bkp = 1;
-        }
 
-        if (!this.fitsThePizza() || heated[yS][xS] < low || (area - heated[yS][xS]) < low) {
+        int tomatoes = countTomatoes(yS, xS);
+
+
+        if (!this.fitsThePizza() || tomatoes < low || (area - tomatoes) < low) {
             return false;
         }
 
