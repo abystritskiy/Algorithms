@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Sortable sizes class
- * Also has pre-calculated pizza coverage
+ * Has pre-calculated pizza coverage and some utility method for easier calculations
  */
 class Slice implements Comparable<Slice> {
     public final int rows;
@@ -18,10 +18,17 @@ class Slice implements Comparable<Slice> {
     public int x0 = 0;
     public Solver.Orientation orientation;
 
-    public Slice(int rows, int colls, char[][] grid) {
+    /**
+     * Construct the slice
+     *
+     * @param rows   number of the rows in the slice
+     * @param cols   number of the cols in the slice
+     * @param grid   pizza components array
+     */
+    public Slice(int rows, int cols, char[][] grid) {
         this.rows = rows;
-        this.cols = colls;
-        this.area = rows * colls;
+        this.cols = cols;
+        this.area = rows * cols;
         this.pizza = grid;
         this.heated = this.heat();
     }
@@ -29,7 +36,7 @@ class Slice implements Comparable<Slice> {
     /**
      * Pre-calculate number of tomatoes in each possible slice
      *
-     * @return
+     * @return  calculations ot the tomatoes numbers for each slice size/position
      */
     public int[][] heat() {
         int[][] cache = new int[pizza.length][pizza[0].length];
@@ -44,8 +51,8 @@ class Slice implements Comparable<Slice> {
     /**
      * Assign slice to specific coordinates
      *
-     * @param y0
-     * @param x0
+     * @param y0    y coordinate of the slice's left top corner
+     * @param x0    x coordinate of the slice's left top corner
      */
     public void locate(int y0, int x0, Solver.Orientation orientation) {
         this.y0 = y0;
@@ -57,7 +64,7 @@ class Slice implements Comparable<Slice> {
      * Check if the slice (y0, x0 - left top corner coordinates)
      * can be fit within the pizza
      *
-     * @return
+     * @return validation result
      */
     public boolean fitsThePizza() {
         if (orientation == Solver.Orientation.TOP_RIGHT) {
@@ -74,9 +81,9 @@ class Slice implements Comparable<Slice> {
      * Check if slice has tomatoes and mushrooms more or equals than "low".
      * Check if the slice does not overlap with the previously cut slices
      *
-     * @param low
-     * @param sliced
-     * @return
+     * @param low       minimum number of each component on the slice
+     * @param sliced    maximum slice size
+     * @return          validates slice if it matches the given conditions
      */
     public boolean isValidSlice(int low, boolean[][] sliced) {
         int[] leftTop = getLeftTop();
@@ -100,7 +107,7 @@ class Slice implements Comparable<Slice> {
     /**
      * Get top left cell position
      *
-     * @return
+     * @return     y,x coordinates of the left top corner
      */
     public int[] getLeftTop() {
         int yS = y0;
@@ -122,7 +129,7 @@ class Slice implements Comparable<Slice> {
     /**
      * Cut the slice out of pizza
      *
-     * @param sliced
+     * @param sliced    array with already used pizza cells
      */
     public void setSliced(boolean[][] sliced) {
         int[] leftTop = getLeftTop();
@@ -139,7 +146,7 @@ class Slice implements Comparable<Slice> {
     /**
      * Revert 'setSliced'
      *
-     * @param sliced
+     * @param sliced    array with already used pizza cells
      */
     public void setUnsliced(boolean[][] sliced) {
         int[] leftTop = getLeftTop();
@@ -155,8 +162,8 @@ class Slice implements Comparable<Slice> {
     /**
      * Get next top point to the right
      *
-     * @param sliced
-     * @return
+     * @param sliced    array with already used pizza cells
+     * @return          get the next point to check
      */
     public List<Integer> getNextRightTopPoint(boolean[][] sliced) {
         if (x0 + this.cols >= pizza[0].length) {
@@ -179,8 +186,8 @@ class Slice implements Comparable<Slice> {
     /**
      * Get next bottom point to the right
      *
-     * @param sliced
-     * @return
+     * @param sliced    array with already used pizza cells
+     * @return          get the next point to check
      */
     public List<Integer> getNextRightBottomPoint(boolean[][] sliced) {
         if (x0 + this.cols >= pizza[0].length) {
@@ -203,8 +210,8 @@ class Slice implements Comparable<Slice> {
     /**
      * Get next top point to the left
      *
-     * @param sliced
-     * @return
+     * @param sliced    array with already used pizza cells
+     * @return          get the next point to check
      */
     public List<Integer> getNextLeftTopPoint(boolean[][] sliced) {
         if (x0 - this.cols < 0) {
@@ -227,8 +234,8 @@ class Slice implements Comparable<Slice> {
     /**
      * Get next bottom point to the left
      *
-     * @param sliced
-     * @return
+     * @param sliced    array with already used pizza cells
+     * @return          get the next point to check
      */
     public List<Integer> getNextLeftBottomPoint(boolean[][] sliced) {
         if (x0 - this.cols < 0) {
@@ -251,8 +258,8 @@ class Slice implements Comparable<Slice> {
     /**
      * Get next point to the bottom
      *
-     * @param sliced
-     * @return
+     * @param sliced    array with already used pizza cells
+     * @return          get the next point to check
      */
     public List<Integer> getNextBottomLeftPoint(boolean[][] sliced) {
         if (y0 + this.rows >= pizza.length) {
@@ -275,8 +282,8 @@ class Slice implements Comparable<Slice> {
     /**
      * Get next point to the bottom
      *
-     * @param sliced
-     * @return
+     * @param sliced    array with already used pizza cells
+     * @return          get the next point to check
      */
     public List<Integer> getNextBottomRightPoint(boolean[][] sliced) {
         if (y0 + this.rows >= pizza.length) {
@@ -299,8 +306,8 @@ class Slice implements Comparable<Slice> {
     /**
      * Get next point to the top
      *
-     * @param sliced
-     * @return
+     * @param sliced    array with already used pizza cells
+     * @return          get the next point to check
      */
     public List<Integer> getNextTopLeftPoint(boolean[][] sliced) {
         if (y0 - this.rows < 0) {
@@ -323,8 +330,8 @@ class Slice implements Comparable<Slice> {
     /**
      * Get next point to the top
      *
-     * @param sliced
-     * @return
+     * @param sliced    array with already used pizza cells
+     * @return          get the next point to check
      */
     public List<Integer> getNextTopRightPoint(boolean[][] sliced) {
         if (y0 - this.rows < 0) {
@@ -347,7 +354,7 @@ class Slice implements Comparable<Slice> {
     /**
      * Count tomatoes on a given slice
      *
-     * @return
+     * @return  number of tomatoes
      */
     private int countTomatoes(int y0, int x0) {
         int tomatoes = 0;
@@ -380,17 +387,17 @@ class Slice implements Comparable<Slice> {
     /**
      * "Compare to" method
      *
-     * @param that
-     * @return
+     * @param that  slice to compare
+     * @return  1 if this is bigger, -1 if that is bigger
      */
     public int compareTo(Slice that) {
-        return this.cols * this.rows > that.cols * that.rows ? 1 : -1;
+        return this.area > that.area ? 1 : -1;
     }
 
     /**
      * To string - just for debug
      *
-     * @return
+     * @return  string representation of the slice
      */
     public String toString() {
         return "{" + rows + ", " + cols + "}" + "{" + y0 + ", " + x0 + "}";

@@ -9,6 +9,10 @@ public class Pizza {
     public static char MUSHROOM = 'M';
     public static char EMPTY = 176;
 
+    /**
+     * Construct the pizza object
+     * @param grid  array with pizza components
+     */
     public Pizza(char[][] grid) {
         this.grid = grid;
         this.rows = grid.length;
@@ -19,7 +23,7 @@ public class Pizza {
      * Print pizza
      */
     public void printPizza() {
-        System.out.println("");
+        System.out.println();
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
                 System.out.print(grid[y][x] + " ");

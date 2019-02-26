@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Class which finds out the best way to cut pizza into slices + utility methods
+ */
 public class PizzaSlicer {
-    // that's how much (in milliseconds) I am ready to wait for it to finish calculation
+    // that's how much (in milliseconds) I am ready to wait for it to finish calculation of one iteration
     public static final int INTERVAL = 120000;
 
     // pizza piece - all this nice tomatoes and mushrooms in the form of char array
@@ -27,19 +30,25 @@ public class PizzaSlicer {
     public List<int[]> coordinates;
 
     /* total maximum area of the slices */
-    public Integer max = 0;
+    public int max = 0;
 
     /* slices left-top right bottom temp-coordinates (y,x) */
     public List<int[]> tempCoordinates;
 
     /* total temp-maximum area of the slices */
-    public Integer tempMax = 0;
+    public int tempMax = 0;
 
     /* Last max value updated - break if it is stuck */
     long lastMaxUpdateTime;
 
     /**
      * Constructor - reads pizza from the file
+     *
+     * @param low           minimum number of each component on the slice
+     * @param high          maximum slice size
+     * @param grid          pizza components array
+     * @param orientation   orientation (e.g TOP-LEFT) from which corner start to put slices
+     * @param sliced        map indicated which cells had been used to avoid overlapping
      */
     public PizzaSlicer(int low, int high, char[][] grid, Solver.Orientation orientation, boolean[][] sliced) {
         this.low = low;
@@ -59,8 +68,8 @@ public class PizzaSlicer {
     /**
      * Constructor - generates random rows*cols pizza
      *
-     * @param rows
-     * @param cols
+     * @param rows  number of rows in pizza
+     * @param cols  number of cols in pizza
      */
     public PizzaSlicer(int rows, int cols, int low, int high, Solver.Orientation orientation) {
         this.low = low;
@@ -85,8 +94,8 @@ public class PizzaSlicer {
      * Recursively try to place slices and measure the covered size
      * Try bigger first. Uses backtracking strategy
      *
-     * @param points
-     * @return
+     * @param points    y,x coordinates to try to put next slice to
+     * @return          true/false to continue/stop further processing
      */
     public boolean slice(List<List<Integer>> points) {
         // if whole pizza is covered, no need to search further
@@ -152,7 +161,7 @@ public class PizzaSlicer {
     /**
      * Remember slice top-left and bottom-right coordintates
      *
-     * @param slice
+     * @param slice slice with it's size and position
      */
     public void rememberSlicePosition(Slice slice) {
         int[] leftTop = slice.getLeftTop();
@@ -168,9 +177,9 @@ public class PizzaSlicer {
      * Ideally, need to move around starting point to find the
      * most optimal solution, but in practice it is too expensive
      *
-     * @param orientation
-     * @param size
-     * @return
+     * @param orientation   orientation (e.g TOP-LEFT) from which corner start to put slices
+     * @param size          slice with it's size and position
+     * @return              list of the points to try put slices next
      */
     private List<List<Integer>> getNextPoints(Slice size, Solver.Orientation orientation) {
         List<List<Integer>> next = new ArrayList<>();
@@ -248,7 +257,7 @@ public class PizzaSlicer {
     /**
      * Show pizza after we 'cut' all the slices
      *
-     * @param slices
+     * @param slices    list of the slices coordinates - y,x for left-top; y,x for right bottom
      */
     public Pizza getCutPizza(List<int[]> slices) {
         Pizza pizza = new Pizza(this.grid);
@@ -268,11 +277,10 @@ public class PizzaSlicer {
     /**
      * Try to extract blocks that left
      *
-     * @param pizza
-     * @param size
-     * @return
+     * @param pizza     pizza components array (including empty spots)
+     * @return          list of the empty rectangles (y,x of top-left; y,x if bottom-right)
      */
-    public List<int[]> getRemnants(char[][] pizza, int size) {
+    public List<int[]> getRemnants(char[][] pizza) {
         List<int[]> remnants = new ArrayList<>();
 
         int y = 0;

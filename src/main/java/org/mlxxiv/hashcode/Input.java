@@ -3,6 +3,9 @@ package org.mlxxiv.hashcode;
 import java.io.*;
 import java.util.List;
 
+/**
+ * Input (and output) files processor
+ */
 public class Input {
     char[][] grid;
     int low, high;
@@ -16,8 +19,7 @@ public class Input {
     /**
      * Read the data file
      *
-     * @param fileName
-     * @return
+     * @param fileName  path to the file with data
      */
     private void readInput(String fileName) {
         try {
@@ -48,7 +50,7 @@ public class Input {
     /**
      * Write the results to file
      *
-     * @param out
+     * @param out   file to write data to
      */
     public void writeOutput(List<int[]> out) {
         String outFileName = getOutFileName(this.filename);
@@ -71,11 +73,12 @@ public class Input {
         }
     }
 
+
     /**
      * Get output file name - change input file name from XXX.in to XXX.out
      *
      * @param inFileName
-     * @return
+     * @return      file name with the replaced extension (from "in" to "out")
      */
     private String getOutFileName(String inFileName) {
         return inFileName.replaceAll(".in", ".out");
