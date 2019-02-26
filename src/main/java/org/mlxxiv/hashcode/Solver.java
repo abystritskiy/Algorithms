@@ -34,7 +34,7 @@ public class Solver {
         // size of the sub-piece, we're going to cut big pizza into.
         // on typical data set with 5-15 max slice size, different values between 10 and 15 performs the best,
         // (in reasonable amount of time) but whoever has a lot of time can play with this value
-        int size = 10;
+        int size = 14;
 
         // number of blocks on y-scale
         int yBlocks = (input.grid.length + size - 1) / size;
@@ -105,7 +105,7 @@ public class Solver {
         }
 
 //        uncomment if you want to see what was covered
-        ps.getCutPizza(results).printPizza();
+//        ps.getCutPizza(results).printPizza();
 
         System.out.println("Total Coverage: " + globalMax);
         System.out.println("Total Coverage Percent: " +
@@ -114,7 +114,7 @@ public class Solver {
 
 
         // write output to the file with the same name and *.out instead of *.in
-//        input.writeOutput(results);
+        input.writeOutput(results);
     }
 
     /**
@@ -187,7 +187,6 @@ public class Solver {
                     results.add(coordinatesWithCorrectedPosition);
                 }
             }
-            ///////////
 
             // only the best goes next!
             if (pizzaSlicer.max >= max) {

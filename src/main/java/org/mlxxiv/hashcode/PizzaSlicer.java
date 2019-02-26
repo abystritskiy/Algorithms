@@ -1,5 +1,6 @@
 package org.mlxxiv.hashcode;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -294,30 +295,51 @@ public class PizzaSlicer {
                 }
                 int y0 = y;
                 int x0 = x;
-                int length = 1;
-                int height = 1;
+                int y1 = y;
+                int x1 = x;
 
                 while (y+1 < pizza.length && pizza[y+1][x] != Pizza.EMPTY) {
-                    height++;
-                    y++;
+                    y1 = y+1;
+                    y = y1;
                 }
 
-                while (x+1 < pizza[0].length && pizza[y][x+1] != Pizza.EMPTY) {
-                    length++;
-                    x++;
+                while (isValidCol(x+1, y0, y1, pizza)) {
+                    x1 = x + 1;
+                    x = x1;
                 }
 
-                x = x+length;
-                y = y0;
                 remnants.add(new int[] {
-                   y0, x0, y0 + height -1, x0 + length - 1
+                   y0, x0, y1, x1
                 });
+                y = y0;
+                x = x1 + 1;
+
             }
             y++;
             x = 0;
         }
 
-
         return remnants;
+    }
+
+    /**
+     * Check if the col does not contain empty cells;
+     *
+     * @param x         x - col position
+     * @param y0        y start point
+     * @param y1        y end row
+     * @param pizza     pizza piece array
+     * @return          if it does not has empty cells
+     */
+    public static boolean isValidCol(int x, int y0, int y1, char[][] pizza) {
+        if (x >= pizza[0].length) {
+            return false;
+        }
+        for (int y=y0; y<=y1; y++) {
+            if (pizza[y][x] == Pizza.EMPTY) {
+                return false;
+            }
+        }
+        return true;
     }
 }
