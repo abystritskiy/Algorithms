@@ -20,7 +20,7 @@ public class Solver {
      */
     public static void main(String[] args) {
         // replace with your data file path or move it to args variable
-        String dataFile = "input/hashcode/pizza/big.in";
+        String dataFile = args[0];
 
         // start time to measure performance
         long startTime = System.currentTimeMillis();
@@ -34,7 +34,7 @@ public class Solver {
         // size of the sub-piece, we're going to cut big pizza into.
         // on typical data set with 5-15 max slice size, different values between 10 and 15 performs the best,
         // (in reasonable amount of time) but whoever has a lot of time can play with this value
-        int size = 14;
+        int size = Integer.parseInt(args[1]);
 
         // number of blocks on y-scale
         int yBlocks = (input.grid.length + size - 1) / size;
@@ -70,6 +70,10 @@ public class Solver {
                             coordinates[3] + xI * size,
                     };
                     results.add(coordinatesWithCorrectedPosition);
+                    globalMax += (
+                            (coordinatesWithCorrectedPosition[2] - coordinatesWithCorrectedPosition[0] + 1)  *
+                            (coordinatesWithCorrectedPosition[3] - coordinatesWithCorrectedPosition[1] + 1)
+                    );
                 }
             }
         }
@@ -77,7 +81,7 @@ public class Solver {
         PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced);
         Pizza pizza = ps.getCutPizza(results);
 
-        pizza.printPizza();
+//        pizza.printPizza();
 
         // try once more - checking what has left
         for (int[] remnant : ps.getRemnants(pizza.grid)) {
@@ -101,6 +105,10 @@ public class Solver {
                         subCoordinates[3] + x0,
                 };
                 results.add(coordinatesWithCorrectedPosition);
+                globalMax += (
+                        (coordinatesWithCorrectedPosition[2] - coordinatesWithCorrectedPosition[0] + 1)  *
+                        (coordinatesWithCorrectedPosition[3] - coordinatesWithCorrectedPosition[1] + 1)
+                );
             }
         }
 
@@ -174,7 +182,7 @@ public class Solver {
                 // enough means enough - will just do top-left only
                 PizzaSlicer subSlicer = new PizzaSlicer(low, high, subGrid, Orientation.TOP_LEFT, subSliced);
                 List<List<Integer>> subNext = new ArrayList<>();
-                subNext.add(firstStartingPoint);
+                subNext.add(subPoint);
                 subSlicer.slice(subNext);
 
                 for (int[] subCoordinates : subSlicer.coordinates) {
@@ -184,7 +192,7 @@ public class Solver {
                             subCoordinates[2] + y01,
                             subCoordinates[3] + x01,
                     };
-                    results.add(coordinatesWithCorrectedPosition);
+                    pizzaSlicer.coordinates.add(coordinatesWithCorrectedPosition);
                 }
             }
 
@@ -194,7 +202,6 @@ public class Solver {
                 results = new ArrayList<>(pizzaSlicer.coordinates);
             }
         }
-        globalMax += max;
         return results;
     }
 
