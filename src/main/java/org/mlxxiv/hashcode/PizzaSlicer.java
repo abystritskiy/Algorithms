@@ -44,11 +44,11 @@ public class PizzaSlicer {
     /**
      * Constructor - reads pizza from the file
      *
-     * @param low           minimum number of each component on the slice
-     * @param high          maximum slice size
-     * @param grid          pizza components array
-     * @param orientation   orientation (e.g TOP-LEFT) from which corner start to put slices
-     * @param sliced        map indicated which cells had been used to avoid overlapping
+     * @param low         minimum number of each component on the slice
+     * @param high        maximum slice size
+     * @param grid        pizza components array
+     * @param orientation orientation (e.g TOP-LEFT) from which corner start to put slices
+     * @param sliced      map indicated which cells had been used to avoid overlapping
      */
     public PizzaSlicer(int low, int high, char[][] grid, Solver.Orientation orientation, boolean[][] sliced) {
         this.low = low;
@@ -68,8 +68,8 @@ public class PizzaSlicer {
     /**
      * Constructor - generates random rows*cols pizza
      *
-     * @param rows  number of rows in pizza
-     * @param cols  number of cols in pizza
+     * @param rows number of rows in pizza
+     * @param cols number of cols in pizza
      */
     public PizzaSlicer(int rows, int cols, int low, int high, Solver.Orientation orientation) {
         this.low = low;
@@ -94,8 +94,8 @@ public class PizzaSlicer {
      * Recursively try to place slices and measure the covered size
      * Try bigger first. Uses backtracking strategy
      *
-     * @param points    y,x coordinates to try to put next slice to
-     * @return          true/false to continue/stop further processing
+     * @param points y,x coordinates to try to put next slice to
+     * @return true/false to continue/stop further processing
      */
     public boolean slice(List<List<Integer>> points) {
         // if whole pizza is covered, no need to search further
@@ -177,9 +177,9 @@ public class PizzaSlicer {
      * Ideally, need to move around starting point to find the
      * most optimal solution, but in practice it is too expensive
      *
-     * @param orientation   orientation (e.g TOP-LEFT) from which corner start to put slices
-     * @param size          slice with it's size and position
-     * @return              list of the points to try put slices next
+     * @param orientation orientation (e.g TOP-LEFT) from which corner start to put slices
+     * @param size        slice with it's size and position
+     * @return list of the points to try put slices next
      */
     private List<List<Integer>> getNextPoints(Slice size, Solver.Orientation orientation) {
         List<List<Integer>> next = new ArrayList<>();
@@ -257,7 +257,7 @@ public class PizzaSlicer {
     /**
      * Show pizza after we 'cut' all the slices
      *
-     * @param slices    list of the slices coordinates - y,x for left-top; y,x for right bottom
+     * @param slices list of the slices coordinates - y,x for left-top; y,x for right bottom
      */
     public Pizza getCutPizza(List<int[]> slices) {
         Pizza pizza = new Pizza(this.grid);
@@ -275,10 +275,100 @@ public class PizzaSlicer {
     }
 
     /**
+     * Try all the orientations
+     *
+     * @param grid pizza components array
+     * @param low  minimum number of each component on the slice
+     * @param high maximum slice size
+     * @return list of slices on the given pizza piece
+     */
+    public static List<int[]> getBest(char[][] grid, int low, int high) {
+        Solver.Orientation[] orientations = new Solver.Orientation[]{
+                Solver.Orientation.TOP_LEFT, Solver.Orientation.TOP_RIGHT, Solver.Orientation.BOTTOM_LEFT, Solver.Orientation.BOTTOM_RIGHT
+        };
+        int[] ys = new int[]{0, 0, grid.length - 1, grid.length - 1};
+        int[] xs = new int[]{0, grid[0].length - 1, 0, grid[0].length - 1};
+
+        int max = 0;
+        List<int[]> results = new ArrayList<>();
+
+        // Try each orientation and find a local maximum
+        for (int i = 0; i <= 3; i++) {
+            Solver.Orientation orientation = orientations[i];
+            int y0 = ys[i];
+            int x0 = xs[i];
+
+            boolean[][] sliced = new boolean[grid.length][grid[0].length];
+            List<Integer> firstStartingPoint = new ArrayList<>();
+            firstStartingPoint.add(y0);
+            firstStartingPoint.add(x0);
+
+            PizzaSlicer pizzaSlicer = new PizzaSlicer(low, high, grid, orientation, sliced);
+            List<List<Integer>> next = new ArrayList<>();
+            next.add(firstStartingPoint);
+            pizzaSlicer.slice(next);
+
+
+            // a bit ugly "nestiness", but gives better results (at least on a small data set)
+            for (int[] remnant : pizzaSlicer.getRemnants(pizzaSlicer.getCutPizza(results).grid)) {
+                int y01 = remnant[0];
+                int x01 = remnant[1];
+                int y11 = remnant[2];
+                int x11 = remnant[3];
+
+                char[][] subGrid = new char[y11 - y01 + 1][x11 - x01 + 1];
+                for (int y = y01; y <= y11; y++) {
+                    for (int x = x01; x <= x11; x++) {
+                        subGrid[y - y01][x - x01] = grid[y][x];
+                    }
+                }
+
+                List<Integer> subPoint = new ArrayList<>();
+                subPoint.add(0);
+                subPoint.add(0);
+                boolean[][] subSliced = new boolean[subGrid.length][subGrid[0].length];
+
+                // enough means enough - will just do top-left only
+                PizzaSlicer subSlicer = new PizzaSlicer(low, high, subGrid, Solver.Orientation.TOP_LEFT, subSliced);
+                List<List<Integer>> subNext = new ArrayList<>();
+                subNext.add(subPoint);
+                subSlicer.slice(subNext);
+
+                for (int[] subCoordinates : subSlicer.coordinates) {
+                    int[] coordinatesWithCorrectedPosition = new int[]{
+                            subCoordinates[0] + y01,
+                            subCoordinates[1] + x01,
+                            subCoordinates[2] + y01,
+                            subCoordinates[3] + x01,
+                    };
+                    pizzaSlicer.coordinates.add(coordinatesWithCorrectedPosition);
+                }
+            }
+
+            // only the best goes next!
+            if (pizzaSlicer.max >= max) {
+                max = pizzaSlicer.max;
+                results = new ArrayList<>(pizzaSlicer.coordinates);
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Get slice size
+     *
+     * @param coordinates
+     * @return
+     */
+    public int getSliceSize(int[] coordinates) {
+        return (coordinates[2] - coordinates[0] + 1) * (coordinates[3] - coordinates[1] + 1);
+    }
+
+    /**
      * Try to extract blocks that left
      *
-     * @param pizza     pizza components array (including empty spots)
-     * @return          list of the empty rectangles (y,x of top-left; y,x if bottom-right)
+     * @param pizza pizza components array (including empty spots)
+     * @return list of the empty rectangles (y,x of top-left; y,x if bottom-right)
      */
     public List<int[]> getRemnants(char[][] pizza) {
         List<int[]> remnants = new ArrayList<>();
@@ -297,18 +387,18 @@ public class PizzaSlicer {
                 int y1 = y;
                 int x1 = x;
 
-                while (y+1 < pizza.length && pizza[y+1][x] != Pizza.EMPTY) {
-                    y1 = y+1;
+                while (y + 1 < pizza.length && pizza[y + 1][x] != Pizza.EMPTY) {
+                    y1 = y + 1;
                     y = y1;
                 }
 
-                while (isValidCol(x+1, y0, y1, pizza)) {
+                while (isValidCol(x + 1, y0, y1, pizza)) {
                     x1 = x + 1;
                     x = x1;
                 }
 
-                remnants.add(new int[] {
-                   y0, x0, y1, x1
+                remnants.add(new int[]{
+                        y0, x0, y1, x1
                 });
                 y = y0;
                 x = x1 + 1;
@@ -321,20 +411,21 @@ public class PizzaSlicer {
         return remnants;
     }
 
+
     /**
      * Check if the col does not contain empty cells;
      *
-     * @param x         x - col position
-     * @param y0        y start point
-     * @param y1        y end row
-     * @param pizza     pizza piece array
-     * @return          if it does not has empty cells
+     * @param x     x - col position
+     * @param y0    y start point
+     * @param y1    y end row
+     * @param pizza pizza piece array
+     * @return if it does not has empty cells
      */
     public static boolean isValidCol(int x, int y0, int y1, char[][] pizza) {
         if (x >= pizza[0].length) {
             return false;
         }
-        for (int y=y0; y<=y1; y++) {
+        for (int y = y0; y <= y1; y++) {
             if (pizza[y][x] == Pizza.EMPTY) {
                 return false;
             }

@@ -11,7 +11,7 @@ public class Solver {
     public static List<int[]> results;
 
     /* total maximum area of the slices */
-    public static Integer globalMax = 0;
+    public static int globalMax = 0;
 
     /**
      * All the fun happens here
@@ -45,6 +45,8 @@ public class Solver {
         // boolean grid with the same size as pizza - to check if slices do not overlap
         boolean[][] sliced = new boolean[input.grid.length][input.grid[0].length];
 
+        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced);
+
         // breaking pizza into smaller square size x size pieces (otherwise exponential complexity will kill us!)
         for (int yI = 0; yI < yBlocks; yI++) {
             for (int xI = 0; xI < xBlocks; xI++) {
@@ -62,7 +64,7 @@ public class Solver {
                     }
                 }
 
-                for (int[] coordinates : getItAll(subGrid, input.low, input.high)) {
+                for (int[] coordinates : ps.getBest(subGrid, input.low, input.high)) {
                     int[] coordinatesWithCorrectedPosition = new int[]{
                             coordinates[0] + yI * size,
                             coordinates[1] + xI * size,
@@ -70,15 +72,12 @@ public class Solver {
                             coordinates[3] + xI * size,
                     };
                     results.add(coordinatesWithCorrectedPosition);
-                    globalMax += (
-                            (coordinatesWithCorrectedPosition[2] - coordinatesWithCorrectedPosition[0] + 1)  *
-                            (coordinatesWithCorrectedPosition[3] - coordinatesWithCorrectedPosition[1] + 1)
-                    );
+                    globalMax += ps.getSliceSize(coordinatesWithCorrectedPosition);
                 }
             }
         }
 
-        PizzaSlicer ps = new PizzaSlicer(input.low, input.high, input.grid, Orientation.TOP_LEFT, sliced);
+
         Pizza pizza = ps.getCutPizza(results);
 
 //        pizza.printPizza();
@@ -97,7 +96,7 @@ public class Solver {
                 }
             }
 
-            for (int[] subCoordinates : getItAll(subGrid, input.low, input.high)) {
+            for (int[] subCoordinates : ps.getBest(subGrid, input.low, input.high)) {
                 int[] coordinatesWithCorrectedPosition = new int[]{
                         subCoordinates[0] + y0,
                         subCoordinates[1] + x0,
@@ -105,10 +104,7 @@ public class Solver {
                         subCoordinates[3] + x0,
                 };
                 results.add(coordinatesWithCorrectedPosition);
-                globalMax += (
-                        (coordinatesWithCorrectedPosition[2] - coordinatesWithCorrectedPosition[0] + 1)  *
-                        (coordinatesWithCorrectedPosition[3] - coordinatesWithCorrectedPosition[1] + 1)
-                );
+                globalMax += ps.getSliceSize(coordinatesWithCorrectedPosition);
             }
         }
 
@@ -123,86 +119,6 @@ public class Solver {
 
         // write output to the file with the same name and *.out instead of *.in
         input.writeOutput(results);
-    }
-
-    /**
-     * Get the maximum of remnants, trying all the orientations
-     *
-     * @param grid  pizza components array
-     * @param low   minimum number of each component on the slice
-     * @param high  maximum slice size
-     * @return      list of slices on the given pizza piece
-     */
-    private static List<int[]> getItAll(char[][] grid, int low, int high) {
-        Orientation[] orientations = new Orientation[] {
-            Orientation.TOP_LEFT, Orientation.TOP_RIGHT, Orientation.BOTTOM_LEFT, Orientation.BOTTOM_RIGHT
-        };
-        int[] ys = new int[] {0, 0, grid.length - 1, grid.length - 1};
-        int[] xs = new int[] {0, grid[0].length - 1, 0, grid[0].length - 1};
-
-        int max = 0;
-        List<int[]> results = new ArrayList<>();
-
-        // Try each orientation and find a local maximum
-        for (int i = 0; i <= 3; i++) {
-            Orientation orientation = orientations[i];
-            int y0 = ys[i];
-            int x0 = xs[i];
-
-            boolean[][] sliced = new boolean[grid.length][grid[0].length];
-            List<Integer> firstStartingPoint = new ArrayList<>();
-            firstStartingPoint.add(y0);
-            firstStartingPoint.add(x0);
-
-            PizzaSlicer pizzaSlicer = new PizzaSlicer(low, high, grid, orientation, sliced);
-            List<List<Integer>> next = new ArrayList<>();
-            next.add(firstStartingPoint);
-            pizzaSlicer.slice(next);
-
-
-            // a bit ugly "nestiness", but gives better results (at least on a small data set)
-            for (int[] remnant : pizzaSlicer.getRemnants(pizzaSlicer.getCutPizza(results).grid)) {
-                int y01 = remnant[0];
-                int x01 = remnant[1];
-                int y11 = remnant[2];
-                int x11 = remnant[3];
-
-                char[][] subGrid = new char[y11 - y01 + 1][x11- x01 + 1];
-                for (int y = y01; y <= y11; y++) {
-                    for (int x = x01; x <= x11; x++) {
-                        subGrid[y - y01][x - x01] = grid[y][x];
-                    }
-                }
-
-                List<Integer> subPoint = new ArrayList<>();
-                subPoint.add(0);
-                subPoint.add(0);
-                boolean[][] subSliced = new boolean[subGrid.length][subGrid[0].length];
-
-                // enough means enough - will just do top-left only
-                PizzaSlicer subSlicer = new PizzaSlicer(low, high, subGrid, Orientation.TOP_LEFT, subSliced);
-                List<List<Integer>> subNext = new ArrayList<>();
-                subNext.add(subPoint);
-                subSlicer.slice(subNext);
-
-                for (int[] subCoordinates : subSlicer.coordinates) {
-                    int[] coordinatesWithCorrectedPosition = new int[]{
-                            subCoordinates[0] + y01,
-                            subCoordinates[1] + x01,
-                            subCoordinates[2] + y01,
-                            subCoordinates[3] + x01,
-                    };
-                    pizzaSlicer.coordinates.add(coordinatesWithCorrectedPosition);
-                }
-            }
-
-            // only the best goes next!
-            if (pizzaSlicer.max >= max) {
-                max = pizzaSlicer.max;
-                results = new ArrayList<>(pizzaSlicer.coordinates);
-            }
-        }
-        return results;
     }
 
     /**
