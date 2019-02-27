@@ -65,25 +65,28 @@ public class Solver {
                 }
 
                 for (int[] coordinates : ps.getBest(subGrid, input.low, input.high)) {
-                    int[] coordinatesWithCorrectedPosition = new int[]{
+                    int[] corrected = new int[]{
                             coordinates[0] + yI * size,
                             coordinates[1] + xI * size,
                             coordinates[2] + yI * size,
                             coordinates[3] + xI * size,
                     };
-                    results.add(coordinatesWithCorrectedPosition);
-                    globalMax += ps.getSliceSize(coordinatesWithCorrectedPosition);
+                    results.add(corrected);
+                    for (int ySliced = corrected[0]; ySliced <= corrected[2]; ySliced++) {
+                        for (int xSliced = corrected[1]; xSliced <= corrected[3] ; xSliced++) {
+                            sliced[ySliced][xSliced] = true;
+                        }
+                    }
+                    globalMax += PizzaSlicer.getSliceSize(corrected);
                 }
             }
         }
 
 
-        Pizza pizza = ps.getCutPizza(results);
-
-//        pizza.printPizza();
-
         // try once more - checking what has left
-        for (int[] remnant : ps.getRemnants(pizza.grid)) {
+        List<int[]> remnants = ps.getRemnants(ps.getCutPizza(results, input.grid).grid);
+
+        for (int[] remnant : remnants) {
             int y0 = remnant[0];
             int x0 = remnant[1];
             int y1 = remnant[2];
@@ -104,12 +107,12 @@ public class Solver {
                         subCoordinates[3] + x0,
                 };
                 results.add(coordinatesWithCorrectedPosition);
-                globalMax += ps.getSliceSize(coordinatesWithCorrectedPosition);
+                globalMax += PizzaSlicer.getSliceSize(coordinatesWithCorrectedPosition);
             }
         }
 
 //        uncomment if you want to see what was covered
-//        ps.getCutPizza(results).printPizza();
+//        ps.getCutPizza(results,input.grid).printPizza();
 
         System.out.println("Total Coverage: " + globalMax);
         System.out.println("Total Coverage Percent: " +

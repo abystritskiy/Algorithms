@@ -259,19 +259,21 @@ public class PizzaSlicer {
      *
      * @param slices list of the slices coordinates - y,x for left-top; y,x for right bottom
      */
-    public Pizza getCutPizza(List<int[]> slices) {
-        Pizza pizza = new Pizza(this.grid);
-
+    public Pizza getCutPizza(List<int[]> slices, char[][] pizza) {
+        char[][] cutGrid = new char[pizza.length][pizza[0].length];
+        for (int i = 0; i < pizza.length; i++) {
+            System.arraycopy(pizza[i], 0, cutGrid[i], 0, pizza[i].length);
+        }
         for (int[] slice : slices) {
             int y0 = slice[0], x0 = slice[1], y1 = slice[2], x1 = slice[3];
 
             for (int y = y0; y <= y1; y++) {
                 for (int x = x0; x <= x1; x++) {
-                    this.grid[y][x] = Pizza.EMPTY;
+                    cutGrid[y][x] = Pizza.EMPTY;
                 }
             }
         }
-        return pizza;
+        return new Pizza(cutGrid);
     }
 
     /**
@@ -310,7 +312,7 @@ public class PizzaSlicer {
 
 
             // a bit ugly "nestiness", but gives better results (at least on a small data set)
-            for (int[] remnant : pizzaSlicer.getRemnants(pizzaSlicer.getCutPizza(results).grid)) {
+            for (int[] remnant : pizzaSlicer.getRemnants(pizzaSlicer.getCutPizza(pizzaSlicer.coordinates, grid).grid)) {
                 int y01 = remnant[0];
                 int x01 = remnant[1];
                 int y11 = remnant[2];
@@ -360,7 +362,7 @@ public class PizzaSlicer {
      * @param coordinates
      * @return
      */
-    public int getSliceSize(int[] coordinates) {
+    public static int getSliceSize(int[] coordinates) {
         return (coordinates[2] - coordinates[0] + 1) * (coordinates[3] - coordinates[1] + 1);
     }
 
@@ -372,6 +374,7 @@ public class PizzaSlicer {
      */
     public List<int[]> getRemnants(char[][] pizza) {
         List<int[]> remnants = new ArrayList<>();
+        boolean[][] used = new boolean[pizza.length][pizza[0].length];
 
         int y = 0;
         int x = 0;
@@ -382,10 +385,7 @@ public class PizzaSlicer {
                     x++;
                     continue;
                 }
-                int y0 = y;
-                int x0 = x;
-                int y1 = y;
-                int x1 = x;
+                int y0 = y, x0 = x, y1 = y, x1 = x;
 
                 while (y + 1 < pizza.length && pizza[y + 1][x] != Pizza.EMPTY) {
                     y1 = y + 1;
@@ -397,9 +397,25 @@ public class PizzaSlicer {
                     x = x1;
                 }
 
-                remnants.add(new int[]{
-                        y0, x0, y1, x1
-                });
+                boolean overlaps = false;
+                for (int yS = y0; yS <= y1 ; yS++) {
+                    for (int xS = x0; xS <= x1; xS++) {
+                        if (used[yS][xS]) {
+                            overlaps = true;
+                            break;
+                        }
+                    }
+                }
+                if (!overlaps) {
+                    remnants.add(new int[]{
+                            y0, x0, y1, x1
+                    });
+                    for (int yS = y0; yS <= y1 ; yS++) {
+                        for (int xS = x0; xS <= x1; xS++) {
+                            used[yS][xS] = true;
+                        }
+                    }
+                }
                 y = y0;
                 x = x1 + 1;
 

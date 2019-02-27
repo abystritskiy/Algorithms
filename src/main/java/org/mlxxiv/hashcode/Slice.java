@@ -11,7 +11,6 @@ class Slice implements Comparable<Slice> {
     public final int rows;
     public final int cols;
     public final int area;
-    public final int[][] heated;
     public final char[][] pizza;
 
     public int y0 = 0;
@@ -30,23 +29,8 @@ class Slice implements Comparable<Slice> {
         this.cols = cols;
         this.area = rows * cols;
         this.pizza = grid;
-        this.heated = this.heat();
     }
 
-    /**
-     * Pre-calculate number of tomatoes in each possible slice
-     *
-     * @return  calculations ot the tomatoes numbers for each slice size/position
-     */
-    public int[][] heat() {
-        int[][] cache = new int[pizza.length][pizza[0].length];
-        for (int y = 0; y <= pizza.length - rows; y++) {
-            for (int x = 0; x <= pizza[0].length - cols; x++) {
-                cache[y][x] = countTomatoes(y, x);
-            }
-        }
-        return cache;
-    }
 
     /**
      * Assign slice to specific coordinates
@@ -70,7 +54,7 @@ class Slice implements Comparable<Slice> {
         if (orientation == Solver.Orientation.TOP_RIGHT) {
             return (y0 + rows <= pizza.length && x0 - cols + 1 >= 0);
         } else if (orientation == Solver.Orientation.BOTTOM_LEFT) {
-            return (y0 - rows + 1 >= 0 && cols <= pizza[0].length);
+            return (y0 - rows + 1 >= 0 && x0 + cols <= pizza[0].length);
         } else if (orientation == Solver.Orientation.BOTTOM_RIGHT) {
             return (y0 - rows + 1 >= 0 && x0 - cols + 1 >= 0);
         }
@@ -86,14 +70,16 @@ class Slice implements Comparable<Slice> {
      * @return          validates slice if it matches the given conditions
      */
     public boolean isValidSlice(int low, boolean[][] sliced) {
+        if (!this.fitsThePizza()) {
+            return false;
+        }
         int[] leftTop = getLeftTop();
         int yS = leftTop[0];
         int xS = leftTop[1];
 
         int tomatoes = countTomatoes(yS, xS);
 
-
-        if (!this.fitsThePizza() || tomatoes < low || (area - tomatoes) < low) {
+        if (tomatoes < low || (area - tomatoes) < low) {
             return false;
         }
 
@@ -361,10 +347,18 @@ class Slice implements Comparable<Slice> {
      */
     private int countTomatoes(int y0, int x0) {
         int tomatoes = 0;
+
+        if (this.toString().equals("{8, 1}{0, 0}")) {
+            int bkp2 = 2;
+        }
+
         for (int y = y0; y < y0 + rows; y++) {
             for (int x = x0; x < x0 + cols; x++) {
+
                 if (pizza[y][x] == Pizza.TOMATO) {
                     tomatoes++;
+                } else {
+                    int not = 0;
                 }
             }
         }

@@ -21,7 +21,8 @@ public class Test {
                 }
             }
             if (tomatoes<in.low || area - tomatoes < in.low) {
-                System.out.println(i+ ": fail: " + Arrays.toString(coord));
+                System.out.println("not met minimum number");
+                System.out.println(i+ ": " + Arrays.toString(coord));
                 System.out.println();
                 for (int y = coord[0]; y <=coord[2] ; y++) {
                     System.out.println();
@@ -29,10 +30,15 @@ public class Test {
                         System.out.print(in.grid[y][x]);
                     }
                 }
+                System.out.println();
+                System.out.println("*******************");
             }
+        }
 
-
+        for (int i = 0; i <coords.length; i++) {
             boolean overlap = false;
+            int[] coord = coords[i];
+
             for (int y = coord[0]; y <=coord[2] ; y++) {
                 for (int x = coord[1]; x <=coord[3] ; x++) {
                     if (in.grid[y][x] == Pizza.EMPTY) {
@@ -43,14 +49,12 @@ public class Test {
                 }
             }
             if (overlap) {
-                System.out.println(i+ ": overlap " + Arrays.toString(coord));
+                System.out.println("overlap");
+                System.out.println(i + ": " + Arrays.toString(coord));
+                System.out.println();
+                System.out.println("*******************");
             }
-
-
         }
+        System.out.println("done");
     }
-
-
-
-
 }
