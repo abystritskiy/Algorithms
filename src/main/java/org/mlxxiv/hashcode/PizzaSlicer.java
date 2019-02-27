@@ -311,7 +311,7 @@ public class PizzaSlicer {
             pizzaSlicer.slice(next);
 
 
-            // a bit ugly "nestiness", but gives better results (at least on a small data set)
+            // a bit ugly "nestiness", but gives better results
             for (int[] remnant : pizzaSlicer.getRemnants(pizzaSlicer.getCutPizza(pizzaSlicer.coordinates, grid).grid)) {
                 int y01 = remnant[0];
                 int x01 = remnant[1];
@@ -325,18 +325,34 @@ public class PizzaSlicer {
                     }
                 }
 
-                List<Integer> subPoint = new ArrayList<>();
-                subPoint.add(0);
-                subPoint.add(0);
-                boolean[][] subSliced = new boolean[subGrid.length][subGrid[0].length];
+                int remnantMax = 0;
+                List<int[]> optimalRemSet = new ArrayList<>();
 
-                // enough means enough - will just do top-left only
-                PizzaSlicer subSlicer = new PizzaSlicer(low, high, subGrid, Solver.Orientation.TOP_LEFT, subSliced);
-                List<List<Integer>> subNext = new ArrayList<>();
-                subNext.add(subPoint);
-                subSlicer.slice(subNext);
+                int[] rys = new int[]{0, 0, subGrid.length - 1, subGrid.length - 1};
+                int[] rxs = new int[]{0, subGrid[0].length - 1, 0, subGrid[0].length - 1};
+                for (int j = 0; j <= 3; j++) {
+                    Solver.Orientation rOrientation = orientations[j];
+                    int rY0 = rys[j];
+                    int rX0 = rxs[j];
 
-                for (int[] subCoordinates : subSlicer.coordinates) {
+                    boolean[][] subSliced = new boolean[subGrid.length][subGrid[0].length];
+                    List<Integer> subPoint = new ArrayList<>();
+                    subPoint.add(rY0);
+                    subPoint.add(rX0);
+
+                    PizzaSlicer subSlicer = new PizzaSlicer(low, high, subGrid, rOrientation, subSliced);
+                    List<List<Integer>> subNext = new ArrayList<>();
+                    subNext.add(subPoint);
+                    subSlicer.slice(subNext);
+
+                    // here it comes our little winner!
+                    if (subSlicer.max >= remnantMax) {
+                        remnantMax = subSlicer.max;
+                        optimalRemSet = new ArrayList<>(subSlicer.coordinates);
+                    }
+                }
+
+                for (int[] subCoordinates : optimalRemSet) {
                     int[] coordinatesWithCorrectedPosition = new int[]{
                             subCoordinates[0] + y01,
                             subCoordinates[1] + x01,

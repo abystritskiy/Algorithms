@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class Test {
 
     public static void main(String[] args) {
-        Input in = new Input("input/hashcode/pizza/medium.in");
+        Input in = new Input("input/hashcode/pizza/big.in");
 
         int[][] coords = in.readResultsFile();
         for (int i =0; i<coords.length; i++) {
