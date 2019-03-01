@@ -2,6 +2,7 @@ package org.mlxxiv.hashcodeonline;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class Io {
                 String[] row = bufferedReader.readLine().trim().split(" ");
                 String orientation = row[0];
                 int tagsNum = Integer.parseInt(row[1]);
-                List<String> tags = new ArrayList<>();
+                HashSet<String> tags = new HashSet<>();
                 for (int j = 2; j < 2 + tagsNum; j++) {
                     tags.add(row[j]);
                 }
@@ -68,17 +69,6 @@ public class Io {
                 bufferedWriter.newLine();
             }
             bufferedWriter.close();
-        } catch (IOException ex) {
-            System.out.println("Error writing to file '" + this.filename+".out" + "'");
-        }
-    }
-
-    public void writeline(Slide slide) {
-        try {
-            FileWriter fileWriter = new FileWriter(this.filename + ".out");
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write( slide.toString());
-            bufferedWriter.newLine();
         } catch (IOException ex) {
             System.out.println("Error writing to file '" + this.filename+".out" + "'");
         }

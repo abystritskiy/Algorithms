@@ -2,30 +2,37 @@ package org.mlxxiv.hashcodeonline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+
+/**
+ * Slide - sortable class, which will allow to compare first slides with more tags first
+ */
 public class Slide implements Comparable<Slide> {
-    public List<String> tags = new ArrayList<>();
-    public List<Photo> photos = new ArrayList<>();
-    public int num;
+    public final HashSet<String> tags;
+    public final List<Photo> photos = new ArrayList<>();
+    public final int size;
 
     public Slide(Photo photo) {
         this.photos.add(photo);
         this.tags = photo.tags;
+        this.size = this.tags.size();
     }
 
     public Slide(Photo photo1, Photo photo2) {
-        List<String> tags1 = new ArrayList();
+        HashSet<String> tags1 = new HashSet();
         if (photo1.orientation.equals(Photo.VERTICAL)) {
             photos.add(photo1);
             tags1.addAll(photo1.tags);
         }
 
-        List<String> tags2 = new ArrayList();
+        HashSet<String> tags2 = new HashSet();
         if (photo2.orientation.equals(Photo.VERTICAL)) {
             photos.add(photo2);
             tags2.addAll(photo2.tags);
         }
 
         this.tags = SlideShow.tagsAggregated(tags1, tags2);
+        this.size = this.tags.size();
     }
 
     public String toString() {
@@ -36,8 +43,15 @@ public class Slide implements Comparable<Slide> {
         );
     }
 
+    public boolean equals(Slide that) {
+        return this.toString().equals(that.toString());
+    }
+
 
     public int compareTo(Slide that) {
-        return this.tags.size() > that.tags.size() ? 1 : -1;
+        if (this.size == that.size) {
+            return 0;
+        }
+        return this.size > that.size ? 1 : -1;
     }
 }
