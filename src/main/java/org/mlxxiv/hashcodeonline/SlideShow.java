@@ -21,7 +21,7 @@ public class SlideShow {
 
         String datafile = "input/hashcodeonline/b_lovely_landscapes.txt";
         Io input = new Io(datafile);
-        int chunkSize = 10000;
+        int chunkSize = 1000;
 
         int processors = Runtime.getRuntime().availableProcessors();
         System.out.println("CPU cores: " + processors);
