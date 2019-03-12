@@ -21,11 +21,7 @@ public class SlideShow {
 
         String datafile = "input/hashcodeonline/b_lovely_landscapes.txt";
         Io input = new Io(datafile);
-        int chunkSize = 1000;
-
-        int processors = Runtime.getRuntime().availableProcessors();
-        System.out.println("CPU cores: " + processors);
-        System.out.println("\n");
+        int chunkSize = 500;
 
         SlideShow.solverSequential(input.photos, chunkSize);
         System.out.println("=======================\n");
@@ -49,63 +45,63 @@ public class SlideShow {
         for (int j = 0; j < chunks ; j++) {
             int cycle = j;
             threads[j] = new Thread(() -> {
-            SlideShow slideShow = new SlideShow();
-            slideShow.processPhotos(photos, cycle*chunkSize, chunkSize);
+                SlideShow slideShow = new SlideShow();
+                slideShow.processPhotos(photos, cycle*chunkSize, chunkSize);
 
-            int threadBestScore = 0;
+                int threadBestScore = 0;
 
-            // combine vertical photos into slides
-            slideShow.buildVerticalSlideSet();
+                // combine vertical photos into slides
+                slideShow.buildVerticalSlideSet();
 
-            if (slideShow.slides.isEmpty()) {
-                    return;
-            }
-            // sort reverse - the more tags 2 slides have, the higher is possible score
-            slideShow.slides.sort(Collections.reverseOrder());
+                if (slideShow.slides.isEmpty()) {
+                        return;
+                }
+                // sort reverse - the more tags 2 slides have, the higher is possible score
+                slideShow.slides.sort(Collections.reverseOrder());
 
-            HashSet<Slide> used = new HashSet<>();
-            Slide slide1 = slideShow.slides.get(0);
+                HashSet<Slide> used = new HashSet<>();
+                Slide slide1 = slideShow.slides.get(0);
 
-            if(!results.isEmpty()) {
-                threadScores[cycle] = getScore(results.get(results.size()-1).tags, slide1.tags);
-            }
+                if(!results.isEmpty()) {
+                    threadScores[cycle] = getScore(results.get(results.size()-1).tags, slide1.tags);
+                }
 
-            results.add(slide1);
-            used.add(slide1);
+                results.add(slide1);
+                used.add(slide1);
 
-            while(used.size() < slideShow.slides.size()-1) {
-                Slide slide2 = null;
-                int bestScore = 0;
-                for (Slide slide : slideShow.slides) {
-                    if (slide1.equals(slide) || used.contains(slide)) {
-                        continue;
+                while(used.size() < slideShow.slides.size()-1) {
+                    Slide slide2 = null;
+                    int bestScore = 0;
+                    for (Slide slide : slideShow.slides) {
+                        if (slide1.equals(slide) || used.contains(slide)) {
+                            continue;
+                        }
+                        int tmpScore = getScore(slide1.tags, slide.tags);
+                        if (slide2 == null || tmpScore > bestScore) {
+                            slide2 = slide;
+                            bestScore = tmpScore;
+                        }
                     }
-                    int tmpScore = getScore(slide1.tags, slide.tags);
-                    if (slide2 == null || tmpScore > bestScore) {
-                        slide2 = slide;
-                        bestScore = tmpScore;
+
+
+                    if (slide2 != null) {
+                        used.add(slide2);
+                        results.add(slide2);
+                        threadBestScore += bestScore;
+                        slide1 = slide2;
+                    } else {
+                        break;
+                    }
+
+                }
+
+                for (Slide slide: slideShow.slides) {
+                    if (!results.contains(slide)) {
+                        results.add(slide);
                     }
                 }
 
-
-                if (slide2 != null) {
-                    used.add(slide2);
-                    results.add(slide2);
-                    threadBestScore += bestScore;
-                    slide1 = slide2;
-                } else {
-                    break;
-                }
-
-            }
-
-            for (Slide slide: slideShow.slides) {
-                if (!results.contains(slide)) {
-                    results.add(slide);
-                }
-            }
-
-            threadScores[cycle] = threadBestScore;
+                threadScores[cycle] = threadBestScore;
             });
 
             threads[j].start();
@@ -125,42 +121,35 @@ public class SlideShow {
         System.out.printf("Parallel Execution Time: %d ms\n\n", (System.currentTimeMillis() - startTime));
     }
 
-    public static void solverSequential(List<Photo> photos, int chunkSize) {
+    public static void solverSequential(List<Photo> photos, int size) {
+
+        // start time to measure performance
         long startTime = System.currentTimeMillis();
 
+        // Resulting slideshow
         List<Slide> results = new ArrayList<>();
-        int score;
+        int score = 0;
+
+        int pages = (photos.size() + size + 1) / size;
 
 
-        int chunks = (photos.size() + chunkSize + 1) / chunkSize;
+        for (int j = 0; j < pages ; j++) {
 
-        Phaser ph = new Phaser(0);
-        ph.bulkRegister(chunks);
-
-        int[] scores = new int[chunks];
-
-        for (int j = 0; j < chunks ; j++) {
             SlideShow slideShow = new SlideShow();
-            slideShow.processPhotos(photos, j*chunkSize, chunkSize);
+            slideShow.processPhotos(photos, j*size, size);
 
-            int threadBestScore = 0;
 
             // combine vertical photos into slides
-            slideShow.buildVerticalSlideSet();
+            slideShow.buildVerticalSlideSet(true);
 
             if (slideShow.slides.isEmpty()) {
-                continue;
+                break;
             }
             // sort reverse - the more tags 2 slides have, the higher is possible score
             slideShow.slides.sort(Collections.reverseOrder());
 
             HashSet<Slide> used = new HashSet<>();
             Slide slide1 = slideShow.slides.get(0);
-
-            if(!results.isEmpty()) {
-                scores[j] = getScore(results.get(results.size()-1).tags, slide1.tags);
-            }
-
             results.add(slide1);
             used.add(slide1);
 
@@ -182,7 +171,7 @@ public class SlideShow {
                 if (slide2 != null) {
                     used.add(slide2);
                     results.add(slide2);
-                    threadBestScore += bestScore;
+                    score += bestScore;
                     slide1 = slide2;
                 } else {
                     break;
@@ -195,13 +184,7 @@ public class SlideShow {
                     results.add(slide);
                 }
             }
-
-            scores[j] = threadBestScore;
-
         }
-
-        score = Arrays.stream(scores).sum();
-
         System.out.printf("Sequential Total Score: %d\n", score);
         System.out.printf("Sequential Execution Time: %d ms\n\n", (System.currentTimeMillis() - startTime));
     }
