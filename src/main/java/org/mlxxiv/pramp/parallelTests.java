@@ -3,9 +3,9 @@ package org.mlxxiv.pramp;
 public class parallelTests {
     public static void main(String[] args) {
 
-        int chunkSize = 100;
+        int chunkSize = 1000;
 
-        int[] arr = new int[1000];
+        int[] arr = new int[10000000];
 
         for (int i = 0; i < arr.length; i++) {
             arr[i] = (int) (Math.random() * 1000);
