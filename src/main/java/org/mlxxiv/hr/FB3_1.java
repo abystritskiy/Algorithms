@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class FB3_1 {
     public static void main(String[] args) {
-        System.out.println(solution("9", "13")); // 6
+        System.out.println(solution("13", "9")); // 6
         System.out.println(solution("21", "29")); // 7
         System.out.println(solution("1", "2")); //1
         System.out.println(solution("4", "31")); //10
@@ -15,7 +15,36 @@ public class FB3_1 {
         System.out.println(solution("1", "10000000000000000001")); //2
     }
 
+
     public static String solution(String x, String y) {
+        BigInteger m = new BigInteger(x);
+        BigInteger f = new BigInteger(y);
+        BigInteger i = new BigInteger("0");
+        BigInteger one = new BigInteger("1");
+        BigInteger zero = new BigInteger("0");
+
+        while (!(m.equals(one) && f.equals(one))) {
+            if (f.compareTo(m) > 0) {
+                BigInteger tmp = new BigInteger(f.toString());
+                f = new BigInteger(m.toString());
+                m = new BigInteger(tmp.toString());
+            }
+
+            if (f.equals(zero) || f.compareTo(zero) < 0 || m.equals(zero) || m.compareTo(zero) < 0) {
+                return  "impossible";
+            } else if (f.equals(one)) {
+                i = i.add(m.subtract(one));
+                return i.toString();
+            } else {
+                i = i.add(m.divide(f));
+                m = m.mod(f);
+            }
+        }
+        return i.toString();
+    }
+
+
+    public static String solutionReverse(String x, String y) {
         BigInteger m = new BigInteger(x);
         BigInteger f = new BigInteger(y);
         BigInteger i = new BigInteger("0");
@@ -24,6 +53,9 @@ public class FB3_1 {
         BigInteger one = new BigInteger("1");
         BigInteger zero = new BigInteger("0");
 
+        if (m.equals(one) && f.equals(one)) return "0";
+
+        if (m.equals(f)) return "impossible";
 
         if (f.mod(two).equals(zero) &&
                 m.mod(two).equals(zero)) {
