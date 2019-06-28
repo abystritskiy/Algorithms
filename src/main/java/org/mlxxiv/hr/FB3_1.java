@@ -10,8 +10,28 @@ public class FB3_1 {
         System.out.println(solution("11", "4")); //5
     }
 
-
     public static String solution(String x, String y) {
+        int m = Integer.parseInt(x);
+        int f = Integer.parseInt(y);
+        int i = 0;
+
+        while (m >= 1 && f >= 1) {
+            if (m == 1 && f == 1) {
+                return Integer.toString(i);
+            } else {
+                if (f > m) {
+                    f -= m;
+                } else {
+                    m -= f;
+                }
+                i++;
+            }
+        }
+
+        return "impossible";
+    }
+
+    public static String solutionStack(String x, String y) {
         int m1 = Integer.parseInt(x);
         int f1 = Integer.parseInt(y);
 
@@ -22,7 +42,6 @@ public class FB3_1 {
 
         ArrayList<ArrayList<Integer>> stack = new ArrayList<>();
         stack.add(init);
-
 
         int solution = Integer.MAX_VALUE;
 
@@ -39,6 +58,7 @@ public class FB3_1 {
                 if (cycle < solution) {
                     solution = cycle;
                 }
+                continue;
             }
 
             if (m0 > m1 || f0 > f1) {
@@ -67,7 +87,7 @@ public class FB3_1 {
 
 
 
-    public static String solutionOld(String x, String y) {
+    public static String solutionGreedy(String x, String y) {
         // initial number of M and F bombs
         int m0 = 1;
         int f0 = 1;
