@@ -6,20 +6,37 @@ import java.util.Map;
 public class FB3_2 {
     public static void main(String[] args) {
 
-        int[] l1 = new int[] {1,1,1};
-        System.out.println(solution(l1)); //1
+        int[] l1 = new int[] {1,2,3,4};
+//        System.out.println(solution(l1)); //1
 
-        int[] l2 = new int[] {1, 2, 3, 4, 5, 6};
-        System.out.println(solution(l2)); //3
+        int[] l2 = new int[] {3, 1, 2, 4, 5, 6};
+//        System.out.println(solution(l2)); //3
 
         int[] l3 = new int[] {1, 2, 3, 4, 5, 6, 8, 48};
-        System.out.println(solution(l3)); //16
+//        System.out.println(solution(l3)); //16
 
         int[] l4 = new int[] {2, 3, 4, 6, 9, 12};
-        System.out.println(solution(l4)); //3
+        System.out.println(solution(l1)); //3
     }
 
+
     public static int solution(int[] l) {
+        int count = 0;
+        int[] track = new int[l.length];
+
+        for (int i = 0; i<l.length; i++) {
+            for (int j = 0; j<i; j++) {
+                if (l[i] % l[j] == 0) {
+                    track[i] = track[i] + 1;
+                    count = count + track[j];
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public static int solution2(int[] l) {
         Arrays.sort(l);
         Node head = new Node(0, 0, "");
 
@@ -38,6 +55,7 @@ public class FB3_2 {
             elements.remove(last);
 
             if (node.level == 3) {
+                System.out.println(node);
                 count++;
             } else {
                 for (Map.Entry<Integer, Node> child: node.children().entrySet()) {
