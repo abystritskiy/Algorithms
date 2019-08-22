@@ -1,11 +1,22 @@
 package org.mlxxiv.lc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class LC139 {
     public static void main(String[] args) {
+        String s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        String[] dictArr = new String[]{
+                "aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa","ba"
+        };
+
+        List<String> dict = new ArrayList<>();
+        for (String word : dictArr) {
+            dict.add(word);
+        }
+        long start = System.nanoTime();
+        System.out.println(wordBreak(s, dict) == false);
+        System.out.println("Time: " + (System.nanoTime() - start) + " ns \n");
+
         List<String> dict1 = new ArrayList<>();
         dict1.add("leet");
         dict1.add("code");
@@ -41,34 +52,59 @@ public class LC139 {
     }
 
     public static boolean wordBreak(String s, List<String> wordDict) {
-        HashMap<HashMap<String, List<String>>, Boolean> cache = new HashMap<>();
-        return wordBreakRecursive(s, wordDict, cache);
-    }
+        HashMap<Character, HashSet<String>> dictionary = new HashMap<>();
+        HashSet<Character> lettersInDict = new HashSet<>();
 
-    private static boolean wordBreakRecursive(String s, List<String> wordDict,
-                                              HashMap<HashMap<String, List<String>>, Boolean> cache) {
-        HashMap<String, List<String>> key = new HashMap<>();
-        key.put(s, wordDict);
-        if (cache.containsKey(key)) {
-            return cache.get(key);
+        for (int i = 0; i < wordDict.size(); i++) {
+            String word = wordDict.get(i);
+            if (s.indexOf(word) == -1) {
+                continue;
+            }
+            for (Character chrD: word.toCharArray()) {
+                lettersInDict.add(chrD);
+            }
+
+            Character firstLetter = word.charAt(0);
+            HashSet<String> startWithLetter = dictionary.getOrDefault(firstLetter, new HashSet<>());
+            startWithLetter.add(word);
+            dictionary.put(
+                firstLetter,
+                startWithLetter
+            );
         }
 
+        for (char charW: s.toCharArray()) {
+            if (!lettersInDict.contains(charW)) {
+                return false;
+            }
+        }
+        HashMap<String, Boolean> cache = new HashMap<>();
+        return wordBreak(s, dictionary, cache);
+    }
+
+    private static boolean wordBreak(String s, HashMap<Character, HashSet<String>> dictionary,
+                                     HashMap<String, Boolean> cache) {
         if (s.trim().length() == 0) {
             return true;
         }
+        if (cache.containsKey(s)) {
+            return cache.get(s);
+        }
+        Character firstLetter = s.charAt(0);
+        HashSet<String> words = dictionary.get(firstLetter);
+        if (words == null || words.isEmpty()) {
+            return false;
+        }
 
-        for (String word: wordDict) {
-            int pos = s.indexOf(word);
-            if (pos != -1) {
-                String sCut = s.substring(0, pos) + " " + s.substring(pos+word.length());
-                if (wordBreakRecursive(sCut, wordDict, cache)) {
-
-                    cache.put(key, true);
+        for (String word: words) {
+            if (s.length() >= word.length() && s.substring(0, word.length()).equals(word)) {
+                String sCut = s.substring(word.length());
+                if (wordBreak(sCut, dictionary, cache)) {
                     return true;
                 }
             }
         }
-        cache.put(key, false);
+        cache.put(s, false);
         return false;
     }
 }
