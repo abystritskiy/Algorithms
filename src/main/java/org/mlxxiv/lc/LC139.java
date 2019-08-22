@@ -1,43 +1,41 @@
-package org.mlxxiv.lc;
-
 import java.util.*;
 
 public class LC139 {
     public static void main(String[] args) {
         String s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
         String[] dictArr = new String[]{
-                "aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa","ba"
+                "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa", "ba"
         };
 
-        List<String> dict = new ArrayList<>();
-        for (String word : dictArr) {
-            dict.add(word);
-        }
+        List<String> dict = new ArrayList<>(Arrays.asList(dictArr));
         long start = System.nanoTime();
-        System.out.println(wordBreak(s, dict) == false);
+        System.out.println(!wordBreak(s, dict));
         System.out.println("Time: " + (System.nanoTime() - start) + " ns \n");
 
         List<String> dict1 = new ArrayList<>();
         dict1.add("leet");
         dict1.add("code");
         String s1 = "leetcode";
-        boolean res1 = true;
-        System.out.println(wordBreak(s1, dict1) == res1);
+        long start1 = System.nanoTime();
+        System.out.println(wordBreak(s1, dict1));
+        System.out.println("Time: " + (System.nanoTime() - start1) + " ns \n");
 
         List<String> dict4 = new ArrayList<>();
         dict4.add("bc");
         dict4.add("cb");
         String s4 = "ccbb";
-        boolean res4 = false;
-        System.out.println(wordBreak(s4, dict4) == res4);
+        long start4 = System.nanoTime();
+        System.out.println(!wordBreak(s4, dict4));
+        System.out.println("Time: " + (System.nanoTime() - start4) + " ns \n");
 
 
         List<String> dict2 = new ArrayList<>();
         dict2.add("apple");
         dict2.add("pen");
         String s2 = "applepenapple";
-        boolean res2 = true;
-        System.out.println(wordBreak(s2, dict2) == res2);
+        long start2 = System.nanoTime();
+        System.out.println(wordBreak(s2, dict2));
+        System.out.println("Time: " + (System.nanoTime() - start2) + " ns \n");
 
         List<String> dict3 = new ArrayList<>();
         dict3.add("cats");
@@ -47,20 +45,20 @@ public class LC139 {
         dict3.add("and");
         dict3.add("cat");
         String s3 = "catsandog";
-        boolean res3 = false;
-        System.out.println(wordBreak(s3, dict3) == res3);
+        long start3 = System.nanoTime();
+        System.out.println(!wordBreak(s3, dict3));
+        System.out.println("Time: " + (System.nanoTime() - start3) + " ns \n");
     }
 
     public static boolean wordBreak(String s, List<String> wordDict) {
         HashMap<Character, HashSet<String>> dictionary = new HashMap<>();
         HashSet<Character> lettersInDict = new HashSet<>();
 
-        for (int i = 0; i < wordDict.size(); i++) {
-            String word = wordDict.get(i);
-            if (s.indexOf(word) == -1) {
+        for (String word : wordDict) {
+            if (!s.contains(word)) {
                 continue;
             }
-            for (Character chrD: word.toCharArray()) {
+            for (Character chrD : word.toCharArray()) {
                 lettersInDict.add(chrD);
             }
 
@@ -68,12 +66,12 @@ public class LC139 {
             HashSet<String> startWithLetter = dictionary.getOrDefault(firstLetter, new HashSet<>());
             startWithLetter.add(word);
             dictionary.put(
-                firstLetter,
-                startWithLetter
+                    firstLetter,
+                    startWithLetter
             );
         }
 
-        for (char charW: s.toCharArray()) {
+        for (char charW : s.toCharArray()) {
             if (!lettersInDict.contains(charW)) {
                 return false;
             }
@@ -84,7 +82,7 @@ public class LC139 {
 
     private static boolean wordBreak(String s, HashMap<Character, HashSet<String>> dictionary,
                                      HashMap<String, Boolean> cache) {
-        if (s.trim().length() == 0) {
+        if (s.length() == 0) {
             return true;
         }
         if (cache.containsKey(s)) {
@@ -96,7 +94,7 @@ public class LC139 {
             return false;
         }
 
-        for (String word: words) {
+        for (String word : words) {
             if (s.length() >= word.length() && s.substring(0, word.length()).equals(word)) {
                 String sCut = s.substring(word.length());
                 if (wordBreak(sCut, dictionary, cache)) {
