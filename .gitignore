@@ -1,5 +1,6 @@
-.idea/*
 .idea/workspace.xml
 out/*
 *DS_Store
 *.idea*
+*.iml
+workspace.xml
