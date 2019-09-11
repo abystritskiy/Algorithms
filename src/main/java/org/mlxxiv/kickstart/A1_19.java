@@ -3,8 +3,8 @@ package org.mlxxiv.kickstart;
 import java.io.*;
 import java.util.*;
 
-public class A19 {
-    public static int calcMinHours(int p, int[] skills) {
+public class A1_19 {
+    private static int calcMinHours(int p, int[] skills) {
         int result = Integer.MAX_VALUE;
         Arrays.sort(skills);
         int i = p - 1;
@@ -48,7 +48,7 @@ public class A19 {
                 skills[j] = Integer.parseInt(row[j]);
             }
             int result = calcMinHours(p, skills);
-            System.out.println(String.format("Case #%d: %d", i, result));
+            System.out.println(String.format("Case #%d: %d", i+1, result));
         }
     }
 }
