@@ -6,29 +6,54 @@ import java.util.*;
 public class A2_19 {
 
     private static int parcels(int[][] map) {
-        int[] maxManDistanceCell = getMaxDistanceCell(map);
-        map[maxManDistanceCell[0]][maxManDistanceCell[1]] = 1;
-        int[] maxManDistanceAfterUpdateCell = getMaxDistanceCell(map);
-        return maxManDistanceAfterUpdateCell[2];
+        List<int[]> maxManDistanceCells = getMaxDistanceCells(map);
+        maxManDistanceCells.remove(maxManDistanceCells.size()-1);
+
+        int minMaxDistance = Integer.MAX_VALUE;
+        for (int[] cell: maxManDistanceCells) {
+            map[cell[0]][cell[1]] = 1;
+            List<int[]> distances = getMaxDistanceCells(map);
+            int dist = distances.get(distances.size()-1)[0];
+            if (dist < minMaxDistance) {
+                minMaxDistance = dist;
+            }
+            map[cell[0]][cell[1]] = 0;
+
+        }
+        return minMaxDistance;
     }
 
-    private static int[] getMaxDistanceCell(int[][] map) {
+    private static List<int[]> getMaxDistanceCells(int[][] map) {
         int maxManDistance = 0;
-        int[] maxManDistanceCoord = new int[] {0,0};
-        for (int r=0; r<map.length; r++) {
+        ArrayList<int[]> maxManDistanceCoord = new ArrayList<>();
+
+        int[][] manMap = new int[map.length][];
+        for (int r = 0; r < map.length; r++) {
             for (int c = 0; c < map[r].length; c++) {
+                if (manMap[r] == null) {
+                    manMap[r] = new int[map[r].length];
+                }
                 int manDistance = calcManDistance(r, c, map);
+                manMap[r][c] = manDistance;
+
                 if (manDistance > maxManDistance) {
                     maxManDistance = manDistance;
-                    maxManDistanceCoord = new int[] {r, c};
+                    maxManDistanceCoord = new ArrayList<>();
+                    maxManDistanceCoord.add(new int[]{r, c});
+                } else if (manDistance == maxManDistance) {
+                    maxManDistanceCoord.add(new int[]{r, c});
                 }
             }
+            System.out.println(Arrays.toString(manMap[r]));
         }
-        return new int[] {maxManDistanceCoord[0], maxManDistanceCoord[1], maxManDistance};
+
+        System.out.println();
+        maxManDistanceCoord.add(new int[] {maxManDistance, 0});
+        return maxManDistanceCoord;
     }
 
-    public static int calcManDistance(int r, int c, int[][] map)  {
-        if (map[r][c] == 1)  return 0;
+    public static int calcManDistance(int r, int c, int[][] map) {
+        if (map[r][c] == 1) return 0;
         int step = 0;
         int[] cell = getClosestCell(r, c, step, map);
         while (cell == null) {
@@ -42,50 +67,51 @@ public class A2_19 {
 
     public static int[] getClosestCell(int r, int c, int step, int[][] map) {
 
-        if (c+step < map[r].length && map[r][c+step] == 1) {
-            return new int[] {r, c+step}; // right
+        if (c + step < map[r].length && map[r][c + step] == 1) {
+            return new int[]{r, c + step}; // right
         }
-        if (c-step >= 0 && map[r][c-step] == 1) {
-            return new int[] {r, c-step}; // left
+        if (c - step >= 0 && map[r][c - step] == 1) {
+            return new int[]{r, c - step}; // left
         }
-        if (r-step >= 0 && map[r-step][c] == 1) {
-            return new int[] {r-step, c}; // top
+        if (r - step >= 0 && map[r - step][c] == 1) {
+            return new int[]{r - step, c}; // top
         }
-        if (r+step < map.length && map[r+step][c] == 1) {
-            return new int[] {r+step, c}; // bottom
+        if (r + step < map.length && map[r + step][c] == 1) {
+            return new int[]{r + step, c}; // bottom
         }
 
         int i = 1;
-        while (i <=step) {
-            if (c-step >= 0 && r-i>=0 && map[r-i][c-step] == 1) {
-                return new int[] {r-i, c-step};
+        while (i <= step) {
+            if (c - step >= 0 && r - i >= 0 && map[r - i][c - step] == 1) {
+                return new int[]{r - i, c - step};
             }
-            if (c-step >= 0 && r+i<map.length && map[r+i][c-step] == 1) {
-                return new int[] {r+i, c-step};
+            if (c - step >= 0 && r + i < map.length && map[r + i][c - step] == 1) {
+                return new int[]{r + i, c - step};
             }
-            if (c+step < map[r].length && r-i>=0 && map[r-i][c+step] == 1) {
-                return new int[] {r-i, c+step};
+            if (c + step < map[r].length && r - i >= 0 && map[r - i][c + step] == 1) {
+                return new int[]{r - i, c + step};
             }
-            if (c+step < map[r].length && r+i<map.length && map[r+i][c+step] == 1) {
-                return new int[] {r+i, c+step};
-            }
-
-            if (r-step >= 0 && c-i >= 0 && map[r-step][c-i] == 1) {
-                return new int[] {r-step, c-i};
-            }
-            if (r-step >= 0 && c+i < map[r-step].length && map[r-step][c+i] == 1) {
-                return new int[] {r-step, c+i};
+            if (c + step < map[r].length && r + i < map.length && map[r + i][c + step] == 1) {
+                return new int[]{r + i, c + step};
             }
 
-            if (r+step < map.length && c-i >= 0 && map[r+step][c-i] == 1) {
-                return new int[] {r+step, c-i};
+            if (r - step >= 0 && c - i >= 0 && map[r - step][c - i] == 1) {
+                return new int[]{r - step, c - i};
             }
-            if (r+step < map.length && c+i < map[r+step].length && map[r+step][c+i] == 1) {
-                return new int[] {r+step, c+i};
+            if (r - step >= 0 && c + i < map[r - step].length && map[r - step][c + i] == 1) {
+                return new int[]{r - step, c + i};
+            }
+
+            if (r + step < map.length && c - i >= 0 && map[r + step][c - i] == 1) {
+                return new int[]{r + step, c - i};
+            }
+            if (r + step < map.length && c + i < map[r + step].length && map[r + step][c + i] == 1) {
+                return new int[]{r + step, c + i};
             }
 
             i++;
         }
+
         return null;
     }
 
@@ -105,10 +131,12 @@ public class A2_19 {
                 for (int k = 0; k < c; k++) {
                     row[k] = Integer.parseInt(rowString[k]);
                 }
+                System.out.println(Arrays.toString(row));
                 map[j] = row;
             }
+            System.out.println();
             int result = parcels(map);
-            System.out.println(String.format("Case #%d: %d", i+1, result));
+            System.out.println(String.format("Case #%d: %d", i + 1, result));
         }
     }
 }
