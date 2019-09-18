@@ -1,58 +1,60 @@
 package org.mlxxiv.kickstart;
 
-import java.io.*;
-import java.util.*;
+import java.sql.SQLOutput;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class A2_19 {
 
     private static int parcels(int[][] map) {
-        List<int[]> maxManDistanceCells = getMaxDistanceCells(map);
-        maxManDistanceCells.remove(maxManDistanceCells.size()-1);
+        int[][] manh = new int[map.length][];
+        boolean hasZeros = false;
+        for (int r = 0; r < map.length; r++) {
+            for (int c = 0; c < map[r].length; c++) {
+                if (manh[r] == null) manh[r] = new int[map[r].length];
+                if (map[r][c] == 0) hasZeros = true;
+                manh[r][c] = calcManhattenDistance(r, c, map);
+            }
+            log(Arrays.toString(manh[r]));
+        }
+
+        if (!hasZeros) return 0;
 
         int minMaxDistance = Integer.MAX_VALUE;
-        for (int[] cell: maxManDistanceCells) {
-            map[cell[0]][cell[1]] = 1;
-            List<int[]> distances = getMaxDistanceCells(map);
-            int dist = distances.get(distances.size()-1)[0];
-            if (dist < minMaxDistance) {
-                minMaxDistance = dist;
-            }
-            map[cell[0]][cell[1]] = 0;
+        int[] pos = new int[2];
 
+        for (int r = 0; r < map.length; r++) {
+            for (int c = 0; c < map[r].length; c++) {
+                if (map[r][c] == 1) continue;
+                int prevDistance = manh[r][c];
+                map[r][c] = 1;
+                manh[r][c] = calcManhattenDistance(r, c, map);
+
+                int maxDistance = getMaxDistance(manh);
+                if (maxDistance < minMaxDistance) {
+                    minMaxDistance = maxDistance;
+                    pos = new int[]{r, c};
+                }
+                map[r][c] = 0;
+                manh[r][c] = prevDistance;
+            }
         }
+        log("\n" + Arrays.toString(pos));
         return minMaxDistance;
     }
 
-    private static List<int[]> getMaxDistanceCells(int[][] map) {
-        int maxManDistance = 0;
-        ArrayList<int[]> maxManDistanceCoord = new ArrayList<>();
-
-        int[][] manMap = new int[map.length][];
-        for (int r = 0; r < map.length; r++) {
-            for (int c = 0; c < map[r].length; c++) {
-                if (manMap[r] == null) {
-                    manMap[r] = new int[map[r].length];
-                }
-                int manDistance = calcManDistance(r, c, map);
-                manMap[r][c] = manDistance;
-
-                if (manDistance > maxManDistance) {
-                    maxManDistance = manDistance;
-                    maxManDistanceCoord = new ArrayList<>();
-                    maxManDistanceCoord.add(new int[]{r, c});
-                } else if (manDistance == maxManDistance) {
-                    maxManDistanceCoord.add(new int[]{r, c});
-                }
+    private static int getMaxDistance(int[][] manh) {
+        int res = 0;
+        for (int r = 0; r < manh.length; r++) {
+            for (int c = 0; c < manh[r].length; c++) {
+                if (manh[r][c] > res)
+                    res = manh[r][c];
             }
-            System.out.println(Arrays.toString(manMap[r]));
         }
-
-        System.out.println();
-        maxManDistanceCoord.add(new int[] {maxManDistance, 0});
-        return maxManDistanceCoord;
+        return res;
     }
 
-    public static int calcManDistance(int r, int c, int[][] map) {
+    private static int calcManhattenDistance(int r, int c, int[][] map) {
         if (map[r][c] == 1) return 0;
         int step = 0;
         int[] cell = getClosestCell(r, c, step, map);
@@ -65,7 +67,7 @@ public class A2_19 {
         return Math.abs(r - cell[0]) + Math.abs(c - cell[1]);
     }
 
-    public static int[] getClosestCell(int r, int c, int step, int[][] map) {
+    private static int[] getClosestCell(int r, int c, int step, int[][] map) {
 
         if (c + step < map[r].length && map[r][c + step] == 1) {
             return new int[]{r, c + step}; // right
@@ -115,9 +117,13 @@ public class A2_19 {
         return null;
     }
 
+    private static void log(String str) {
+        System.out.println(str);
+    }
+
     private static final Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         int t = Integer.parseInt(scanner.nextLine().trim());
         for (int i = 0; i < t; i++) {
             String[] numbers = scanner.nextLine().split(" ");
@@ -131,10 +137,10 @@ public class A2_19 {
                 for (int k = 0; k < c; k++) {
                     row[k] = Integer.parseInt(rowString[k]);
                 }
-                System.out.println(Arrays.toString(row));
+                log(Arrays.toString(row));
                 map[j] = row;
             }
-            System.out.println();
+            log("");
             int result = parcels(map);
             System.out.println(String.format("Case #%d: %d", i + 1, result));
         }
