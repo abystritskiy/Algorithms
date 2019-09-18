@@ -1,21 +1,19 @@
 package org.mlxxiv.kickstart;
 
-import java.sql.SQLOutput;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class A2_19 {
-
     private static int parcels(int[][] map) {
-        int[][] manh = new int[map.length][];
+        int[][] manhattan = new int[map.length][];
         boolean hasZeros = false;
         for (int r = 0; r < map.length; r++) {
             for (int c = 0; c < map[r].length; c++) {
-                if (manh[r] == null) manh[r] = new int[map[r].length];
+                if (manhattan[r] == null) manhattan[r] = new int[map[r].length];
                 if (map[r][c] == 0) hasZeros = true;
-                manh[r][c] = calcManhattenDistance(r, c, map);
+                manhattan[r][c] = calcManhattanDistance(r, c, map);
             }
-            log(Arrays.toString(manh[r]));
+            log(Arrays.toString(manhattan[r]));
         }
 
         if (!hasZeros) return 0;
@@ -26,21 +24,39 @@ public class A2_19 {
         for (int r = 0; r < map.length; r++) {
             for (int c = 0; c < map[r].length; c++) {
                 if (map[r][c] == 1) continue;
-                int prevDistance = manh[r][c];
+                int prevDistance = manhattan[r][c];
                 map[r][c] = 1;
-                manh[r][c] = calcManhattenDistance(r, c, map);
 
-                int maxDistance = getMaxDistance(manh);
+                int[][] copy = copyManhattan(manhattan);
+                recalculateManhattanPart(map, manhattan, r, c, prevDistance, copy);
+
+                int maxDistance = getMaxDistance(copy);
                 if (maxDistance < minMaxDistance) {
                     minMaxDistance = maxDistance;
                     pos = new int[]{r, c};
                 }
                 map[r][c] = 0;
-                manh[r][c] = prevDistance;
+
             }
         }
         log("\n" + Arrays.toString(pos));
         return minMaxDistance;
+    }
+
+    private static void recalculateManhattanPart(int[][] map, int[][] manhattan, int r, int c, int radius, int[][] copy) {
+        for (int r1 = 0; r1 < Math.min(manhattan.length, r + radius); r1++) {
+            for (int c1 = Math.max(0, c - radius); c1 < Math.min(manhattan[r1].length, c + radius); c1++) {
+                copy[r1][c1] = calcManhattanDistance(r1, c1, map);
+            }
+        }
+    }
+
+    private static int[][] copyManhattan(int[][] manhattan) {
+        int[][] copy = new int[manhattan.length][manhattan[0].length];
+        for (int i = 0; i < manhattan.length; i++) {
+            System.arraycopy(manhattan[i], 0, copy[i], 0, manhattan[i].length);
+        }
+        return copy;
     }
 
     private static int getMaxDistance(int[][] manh) {
@@ -54,7 +70,7 @@ public class A2_19 {
         return res;
     }
 
-    private static int calcManhattenDistance(int r, int c, int[][] map) {
+    private static int calcManhattanDistance(int r, int c, int[][] map) {
         if (map[r][c] == 1) return 0;
         int step = 0;
         int[] cell = getClosestCell(r, c, step, map);
@@ -118,7 +134,7 @@ public class A2_19 {
     }
 
     private static void log(String str) {
-        System.out.println(str);
+//        System.out.println(str);
     }
 
     private static final Scanner scanner = new Scanner(System.in);
