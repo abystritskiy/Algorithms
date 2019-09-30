@@ -49,8 +49,6 @@ public class A2_19_2 {
                 if (map[r][c] == 0) hasZeros = true;
                 manhattan[r][c] = calcManhattanDistance(r, c, map);
             }
-//            log("===");
-//            log(Arrays.toString(map[r]));
             log(Arrays.toString(manhattan[r]));
         }
         log("");
@@ -72,10 +70,6 @@ public class A2_19_2 {
 
     private static int calcManhattanDistance(int r, int c, int[][] map) {
         if (map[r][c] == 1) return 0;
-
-        if (r == 1 && c == 0) {
-            boolean debug = true;
-        }
 
         LinkedList<int[]> queue = new LinkedList<>();
         boolean[][] visited = new boolean[map.length][];
