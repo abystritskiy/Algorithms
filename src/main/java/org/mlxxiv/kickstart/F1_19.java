@@ -28,18 +28,20 @@ public class F1_19 {
             String binNum = Integer.toBinaryString(i);
             String mask = (new String(new char[wall.length - binNum.length()]).
                     replace("\0", "0")) + binNum;
+
             int[] sample = new int[wall.length];
             for (int j = 0; j < wall.length; j++) {
                 if (mask.charAt(j) ==  '0') {
                     if (j == 0) {
                         sample[0] = wall[1];
                     } else {
-                        sample[j] = wall[j-1];
+                        sample[j] = sample[j-1];
                     }
                 } else {
                     sample[j] = wall[j];
                 }
             }
+//            System.out.println(Arrays.toString(sample));
             if (validate(sample, k)) {
                 options.add(sample);
             }
@@ -74,7 +76,7 @@ public class F1_19 {
     }
 
     private static void log(String str) {
-//        System.out.println(str);
+        System.out.println(str);
     }
 
     private static final Scanner scanner = new Scanner(System.in);
@@ -91,7 +93,6 @@ public class F1_19 {
             for (int j = 0; j < size; j++) {
                 wall[j] = Integer.parseInt(rowString[j]);
             }
-            log(Arrays.toString(wall));
             int result = action(wall, k);
             System.out.println(String.format("Case #%d: %d", i + 1, result));
         }
