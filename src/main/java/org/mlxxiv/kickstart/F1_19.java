@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 //public class Solution {
 public class F1_19 {
-    public static int action(int[] wall, int k){
+    public static int action(int[] wall, int k) {
         if (validate(wall, k)) return 0;
 
         int res = wall.length - 1;
@@ -20,9 +20,30 @@ public class F1_19 {
         return res;
     }
 
-    private static HashSet<int[]> getOptions(int[] wall, int k)
-    {
+    private static HashSet<int[]> getOptions(int[] wall, int k) {
         HashSet<int[]> options = new HashSet<>();
+        int n = wall.length;
+
+        for (int i = 0; i < Math.pow(2, n); i++) {
+            String binNum = Integer.toBinaryString(i);
+            String mask = (new String(new char[wall.length - binNum.length()]).
+                    replace("\0", "0")) + binNum;
+            int[] sample = new int[wall.length];
+            for (int j = 0; j < wall.length; j++) {
+                if (mask.charAt(j) ==  '0') {
+                    if (j == 0) {
+                        sample[0] = wall[1];
+                    } else {
+                        sample[j] = wall[j-1];
+                    }
+                } else {
+                    sample[j] = wall[j];
+                }
+            }
+            if (validate(sample, k)) {
+                options.add(sample);
+            }
+        }
 
         return options;
     }
@@ -34,15 +55,14 @@ public class F1_19 {
                 steps++;
             }
         }
-        return 0;
+        return steps;
     }
 
-    private static boolean validate(int[] wall, int k)
-    {
+    private static boolean validate(int[] wall, int k) {
         int sections = 0;
 
         for (int i = 0; i < wall.length; i++) {
-            if (i == 0 || wall[i] != wall[i-1]) {
+            if (i > 0 && wall[i] != wall[i - 1]) {
                 sections++;
             }
             if (sections > k) {
@@ -54,7 +74,7 @@ public class F1_19 {
     }
 
     private static void log(String str) {
-        System.out.println(str);
+//        System.out.println(str);
     }
 
     private static final Scanner scanner = new Scanner(System.in);
