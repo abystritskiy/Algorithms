@@ -8,6 +8,9 @@ public class LC7 {
 
 
     public static int reverse(int x) {
+        if (x >= Math.pow(2, 31) - 1 || x <= Math.pow(-2, 31)) return 0;
+
+
         int sign = (x >= 0  ? 1 : -1);
         x = Math.abs(x);
         int maxPow = (int) Math.log10(x);
@@ -28,7 +31,7 @@ public class LC7 {
     }
 
     public static void main(String[] args){
-        System.out.println(reverse(123));
+        System.out.println(reverse(-2147483648));
     }
 
 
