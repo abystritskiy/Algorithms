@@ -1,4 +1,4 @@
-package org.mlxxiv.kickstart;
+package org.mlxxiv.kickstart.F2019;
 
 import java.util.ArrayList;
 import java.util.Arrays;

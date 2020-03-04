@@ -1,4 +1,4 @@
-package org.mlxxiv.kickstart;
+package org.mlxxiv.kickstart.A2019;
 
 import java.util.Arrays;
 import java.util.LinkedList;
